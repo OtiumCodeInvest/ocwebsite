@@ -142,6 +142,11 @@
         button:hover {
             background-color: #45a049;
         }
+        #form-status {
+            margin-top: 15px;
+            font-weight: bold;
+            text-align: center;
+        }
 
         .footer {
             margin-top: 40px;
@@ -200,7 +205,7 @@
 
     <div class="contact-section">
         <h2>Kontakt os</h2>
-        <form action="https://formspree.io/f/meaqyldz" method="POST">
+        <form id="contact-form" action="https://formspree.io/f/meaqyldz" method="POST">
             <label for="name">Navn</label>
             <input type="text" id="name" name="name" required>
 
@@ -211,6 +216,7 @@
             <textarea id="message" name="message" rows="5" required></textarea>
 
             <button type="submit">Send besked</button>
+            <p id="form-status"></p>
         </form>
     </div>
 
@@ -220,6 +226,41 @@
         Sværtegade 3, 2. sal i 1118 København K</p>
     </div>
 </div>
+
+<script>
+    var form = document.getElementById("contact-form");
+    var statusMessage = document.getElementById("form-status");
+
+    form.addEventListener("submit", function(event) {
+        event.preventDefault(); // Forhindrer at siden genindlæses
+        var data = new FormData(form);
+        fetch(form.action, {
+            method: form.method,
+            body: data,
+            headers: {
+                'Accept': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                statusMessage.innerHTML = "Tak for din besked! Vi vender tilbage hurtigst muligt.";
+                statusMessage.style.color = "#4CAF50";
+                form.reset(); // Rydder formularfelterne
+            } else {
+                response.json().then(data => {
+                    if (Object.hasOwn(data, 'errors')) {
+                        statusMessage.innerHTML = data["errors"].map(error => error["message"]).join(", ");
+                    } else {
+                        statusMessage.innerHTML = "Hov! Der opstod et problem med at sende din besked.";
+                    }
+                    statusMessage.style.color = "#ff4444";
+                })
+            }
+        }).catch(error => {
+            statusMessage.innerHTML = "Hov! Der opstod et problem med at sende din besked.";
+            statusMessage.style.color = "#ff4444";
+        });
+    });
+</script>
 
 </body>
 </html>
