@@ -12,6 +12,7 @@
             margin: 0;
             padding: 0;
             line-height: 1.6;
+            overflow-x: hidden;
         }
         
         .container {
@@ -35,9 +36,14 @@
             font-weight: bold;
         }
 
+        /* --- Hero Section --- */
         .logo-section {
             text-align: center;
-            margin: 80px 0;
+            padding: 60px 20px;
+            margin-bottom: 40px;
+            background: #181818;
+            border-radius: 6px;
+            border: 1px solid #282828;
         }
         .logo-main {
             font-size: 6.5rem;
@@ -55,23 +61,154 @@
             text-transform: uppercase;
         }
 
+        /* --- About Section --- */
         .about-section {
-            margin-bottom: 60px;
+            margin-bottom: 40px;
+            padding: 30px;
+            background-color: #151515;
+            border-radius: 6px;
+            border-left: 4px solid #4CAF50;
             font-size: 1.1rem;
         }
         .about-section p {
             margin-bottom: 20px;
         }
+        .about-section p:last-child {
+            margin-bottom: 0;
+        }
 
+        /* --- Projects Carousel Styles --- */
+        .projects-section {
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            background-color: #1a1a1a;
+            border-radius: 6px;
+            border: 1px solid #2a2a2a;
+            position: relative;
+        }
+        .projects-section h2 {
+            color: #fff;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+        .carousel-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .carousel-track {
+            display: flex;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            scroll-snap-type: x mandatory;
+            gap: 20px;
+            padding-bottom: 15px;
+            scrollbar-width: thin;
+            scrollbar-color: #4CAF50 #121212;
+        }
+        .carousel-track::-webkit-scrollbar {
+            height: 8px;
+        }
+        .carousel-track::-webkit-scrollbar-track {
+            background: #121212;
+            border-radius: 4px;
+        }
+        .carousel-track::-webkit-scrollbar-thumb {
+            background-color: #4CAF50;
+            border-radius: 4px;
+        }
+        .project-card {
+            flex: 0 0 calc(100% - 40px);
+            background: #222222;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 20px;
+            scroll-snap-align: center;
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+        
+        /* Image and Watermark Wrapper */
+        .img-wrapper {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            flex-shrink: 0;
+            overflow: hidden; 
+            border-radius: 4px;
+        }
+        .project-img {
+            width: 100%;
+            height: 100%;
+            background-color: #2a2a2a;
+            object-fit: cover;
+            display: block;
+        }
+        
+        /* Direct Watermark Overlay with Yellow Color Tint */
+        .ai-watermark {
+            position: absolute;
+            top: 2px;
+            left: 6px;
+            width: 90px;
+            height: auto;
+            pointer-events: none;
+            mix-blend-mode: screen; 
+            filter: sepia(100%) saturate(1000%) hue-rotate(5deg) brightness(1.1);
+        }
+        
+        .project-info {
+            flex: 1;
+        }
+        .project-info h3 {
+            margin: 0 0 10px 0;
+            color: #fff;
+            font-size: 1.2rem;
+        }
+        .project-info p {
+            margin: 0;
+            font-size: 0.95rem;
+            color: #ccc;
+            line-height: 1.5;
+        }
+        .carousel-btn {
+            background: #333;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            position: absolute;
+            z-index: 10;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+            transition: background 0.2s;
+        }
+        .carousel-btn:hover {
+            background: #4CAF50;
+        }
+        .prev-btn { left: -10px; }
+        .next-btn { right: -10px; }
+        /* -------------------------------- */
+
+        /* --- Profiles Section --- */
         .profiles {
             display: flex;
             gap: 20px;
-            margin-bottom: 60px;
+            margin-bottom: 40px;
         }
         .profile {
-            background: #1e1e1e;
-            padding: 20px;
-            border-radius: 4px;
+            background: #171717;
+            border: 1px solid #262626;
+            padding: 25px;
+            border-radius: 6px;
             flex: 1;
         }
         .profile img {
@@ -98,10 +235,12 @@
             line-height: 1.5;
         }
 
+        /* --- Contact Section --- */
         .contact-section {
-            background: #1e1e1e;
+            background: #1f1f1f;
+            border: 1px solid #333;
             padding: 30px;
-            border-radius: 4px;
+            border-radius: 6px;
         }
         .contact-section h2 {
             margin-top: 0;
@@ -148,15 +287,31 @@
             text-align: center;
         }
 
+        /* --- Footer Section --- */
         .footer {
             margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #333;
+            padding: 25px 20px;
+            background: #101010;
+            border-radius: 6px;
+            border-top: 2px solid #222;
             text-align: center;
             color: #888;
             font-size: 0.95rem;
         }
 
+        @media (max-width: 768px) {
+            .carousel-btn {
+                display: none;
+            }
+            .project-card {
+                flex-direction: column;
+                flex: 0 0 90%;
+            }
+            .img-wrapper {
+                width: 100%;
+                height: 180px;
+            }
+        }
         @media (max-width: 600px) {
             .profiles {
                 flex-direction: column;
@@ -182,24 +337,128 @@
         
         <p>We are open to various collaboration models, ranging from traditional work-for-hire to investing time for potential upside. Our primary criteria for taking on new projects is the technical challenge involved.</p>
         
-        <p>Over our 25+ years of experience. Core programming languages include C, C++, and Python, alongside highly optimized, low-level assembly programming and optimizing models for embedded systems. We also have experience with PCB microcontroller design and firmware development.</p>
+        <p>Over our 25+ years of experience we have transitioned from AAA game development to training ML models for image analysis back in 2016. We are full stack programmers and our core programming languages include C, C++, and Python, alongside highly optimized, low-level assembly programming and optimizing models for embedded systems. We also have experience with PCB microcontroller design and firmware development.</p>
     </div>
 
+    <!-- Projects Carousel Section -->
+    <div class="projects-section">
+        <h2>Selected Projects</h2>
+        <div class="carousel-wrapper">
+            <button class="carousel-btn prev-btn" aria-label="Previous">‹</button>
+            <div class="carousel-track" id="project-track">
+                
+                <div class="project-card">
+                    <div class="img-wrapper">
+                        <img src="proj1.jpg" alt="Floor Plans to CAD" class="project-img">
+                        <img src="MadeWithAI.jpg" class="ai-watermark" alt="Made with AI">
+                    </div>
+                    <div class="project-info">
+                        <h3>Floor Plans to CAD</h3>
+                        <p>System for converting hand-drawn or rendered pixel-based images of architectural floor plans to CAD format. This included locating symbols (Doors/Windows) and general wall structures. We developed an end-to-end AI infrastructure starting with data collection and custom annotation tools using foundation models. The AI models combined U-Net for segmentation/graphs and ViT for element analysis. Executed via a custom secure RPC server (PyTorch) to allow low hardware requirements for the end user, with a client side in C++.</p>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="img-wrapper">
+                        <img src="proj2.jpg" alt="Robotics RF Sensors" class="project-img">
+                        <img src="MadeWithAI.jpg" class="ai-watermark" alt="Made with AI">
+                    </div>
+                    <div class="project-info">
+                        <h3>Robotics RF Sensors</h3>
+                        <p>Low latency large-scale robotics RF sensors to Python infrastructure. Included RF design using forward error correction (Reed-Solomon) for ultra-low glass-to-glass latency. The platform collected camera and LiDAR data directly into GPU memory for fast Python inference on the host computer. Sensors ran on a Pi CM4 with a custom RF board (designed in KiCad). The infrastructure was written in C/C++ with a Python AI endpoint.</p>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="img-wrapper">
+                        <img src="proj3.jpg" alt="UWB Positioning System" class="project-img">
+                        <img src="MadeWithAI.jpg" class="ai-watermark" alt="Made with AI">
+                    </div>
+                    <div class="project-info">
+                        <h3>UWB Positioning System</h3>
+                        <p>Designed PCB (KiCad) for base stations and tags for &lt;10cm triangulation of position for indoor robots. The system was built around an STM microcontroller and the DW3120 IC from Qorvo. We wrote custom firmware and integrated it directly with a Pi CM4 without any additional microcontrollers. The system was mainly written in C.</p>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="img-wrapper">
+                        <img src="proj4.jpg" alt="Factory Floor Triangulation" class="project-img">
+                        <img src="MadeWithAI.jpg" class="ai-watermark" alt="Made with AI">
+                    </div>
+                    <div class="project-info">
+                        <h3>Factory Floor Triangulation</h3>
+                        <p>Multicamera triangulation system for humans and robots based on a pose ML network. It locates body/robot parts to reconstruct poses and global positions relative to cameras. Designed to define virtual areas for automated observation (e.g., verifying safety equipment or validating entities in zones). Proprietary ML analyzed images locally, sending 2D pose data to a central PC for triangulation. Embedded execution (NVIDIA Jetson / TensorRT) allows scaling to massive areas like airports.</p>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="img-wrapper">
+                        <img src="proj5.jpg" alt="Smart City Camera" class="project-img">
+                        <img src="MadeWithAI.jpg" class="ai-watermark" alt="Made with AI">
+                    </div>
+                    <div class="project-info">
+                        <h3>Smart City Solutions</h3>
+                        <p>Privacy-by-design camera solution for counting bicycles, pedestrians, and cars, sending only anonymized data from the local sensor. Implemented on the NVIDIA Jetson TX2 platform using a YOLO architecture model. We built a custom ML primitives framework for fast CPU/GPU inference. The solution included time-travel estimation to match cars across multiple cameras using a GDPR-safe embedding algorithm.</p>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="img-wrapper">
+                        <img src="proj6.jpg" alt="Face Statistics" class="project-img">
+                        <img src="MadeWithAI.jpg" class="ai-watermark" alt="Made with AI">
+                    </div>
+                    <div class="project-info">
+                        <h3>Face Statistics & Recognition</h3>
+                        <p>A system to simplify keycard check-ins by matching facial features against an employee database, also used for matching unknown-against-unknown for public traffic statistics. Featured a custom embedded webserver and a proprietary timeseries database written entirely in C++. The hardware utilized a custom embedded system running two Linux units with an FPGA-based inference accelerator.</p>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="img-wrapper">
+                        <img src="proj7.jpg" alt="Inner Ear Scanner" class="project-img">
+                    </div>
+                    <div class="project-info">
+                        <h3>Inner Ear Scanner</h3>
+                        <p>A scanner for the inner ear with 200-micron precision for hearing aid fitting. Used a head-fixated fiducial to estimate the camera's 6-DoF extrinsic pose via computer vision. The 3D point cloud generation utilized laser line triangulation, and the mesh was generated with Poisson surface reconstruction. The entire pipeline, from image retrieval to rendering, was implemented in C++, optimized with SIMD, and rendered in OpenGL.</p>
+                    </div>
+                </div>
+
+            </div>
+            <button class="carousel-btn next-btn" aria-label="Next">›</button>
+        </div>
+    </div>
+
+    <!-- Who We Are -->
     <div class="profiles">
         <div class="profile">
             <img src="dg.jpg" alt="David Norden Guldbrandsen">
             <h3>David Norden Guldbrandsen</h3>
-            <h4>Serial entrepreneur with a background in AAA games. Founder and VP of IO Interactive.</h4>
-            <p><strong>Past Companies:</strong><br>
-            Zyrinx, IO Interactive, Reto-Moto, Haptico, TiTon ApS, Grazper, MayFly AI.</p>
+            <h4>Serial entrepreneur and programmer with a focus on optimization and visualization.</h4>
+            <p>
+                CEO, MayFly AI<br>
+                CTO Partner, Grazper<br>
+                CEO, TiTon ApS<br>
+                Managing Director, Haptico<br>
+                Founder, Reto-Moto<br>
+                Founder & VP, IO Interactive<br>
+                CEO, Zyrinx
+            </p>
         </div>
         
         <div class="profile">
             <img src="jh.jpg" alt="Jakob Hunsballe">
             <h3>Jakob Hunsballe</h3>
             <h4>Master's degree in physics/astrophysics.</h4>
-            <p><strong>Past Companies:</strong><br>
-            WebPoint, IO-Interactive, Capres A/S, Unity Technologies, Grazper, MayFly AI, Optum Computational Engineering, Fikspunkt ApS.</p>
+            <p>
+                CEO, Fikspunkt ApS<br>
+                Senior Programmer, Optum Computational Engineering<br>
+                Founder, MayFly AI<br>
+                Senior Programmer, Grazper<br>
+                Senior Programmer, Unity Technologies<br>
+                Senior Programmer, Capres A/S<br>
+                Programmer, IO Interactive<br>
+                Programmer, WebPoint
+            </p>
         </div>
     </div>
 
@@ -228,11 +487,12 @@
 </div>
 
 <script>
+    // Contact Form Script
     var form = document.getElementById("contact-form");
     var statusMessage = document.getElementById("form-status");
 
     form.addEventListener("submit", function(event) {
-        event.preventDefault(); // Prevents the default redirect
+        event.preventDefault();
         var data = new FormData(form);
         fetch(form.action, {
             method: form.method,
@@ -244,7 +504,7 @@
             if (response.ok) {
                 statusMessage.innerHTML = "Message sent successfully! We will get back to you soon.";
                 statusMessage.style.color = "#4CAF50";
-                form.reset(); // Clears the form fields
+                form.reset();
             } else {
                 response.json().then(data => {
                     if (Object.hasOwn(data, 'errors')) {
@@ -259,6 +519,24 @@
             statusMessage.innerHTML = "Oops! There was a problem sending your message.";
             statusMessage.style.color = "#ff4444";
         });
+    });
+
+    // Carousel Script
+    document.addEventListener("DOMContentLoaded", function() {
+        const track = document.getElementById('project-track');
+        const prevBtn = document.querySelector('.prev-btn');
+        const nextBtn = document.querySelector('.next-btn');
+
+        if (track && prevBtn && nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                const scrollAmount = track.querySelector('.project-card').offsetWidth + 20;
+                track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            });
+            prevBtn.addEventListener('click', () => {
+                const scrollAmount = track.querySelector('.project-card').offsetWidth + 20;
+                track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            });
+        }
     });
 </script>
 
