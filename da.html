@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="da">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -364,8 +364,8 @@
 
 <div class="container">
     <div class="header">
-        <a href="da.html">Dansk</a> | 
-        <a href="en.html" class="active">English</a>
+        <a href="da.html" class="active">Dansk</a> | 
+        <a href="en.html">English</a>
     </div>
 
     <div class="logo-section">
@@ -374,108 +374,108 @@
     </div>
 
     <div class="about-section">
-        <p>Otium Code is a software consultancy firm. We specialize in developing machine learning models, implementing end-to-end AI products from data collection, building annotation tools, training neural networks, and optimizing inference. Most recently, we delivered a large-scale solution converting architectural drawings into precise CAD models.</p>
+        <p>Otium Code er et softwarekonsulentfirma. Vi specialiserer os i at udvikle maskinlæringsmodeller, implementere end-to-end AI-produkter fra dataindsamling, bygge annotationsværktøjer, træne neurale netværk og optimere inferens. Senest har vi leveret en storskala-løsning til konvertering af arkitekttegninger til præcise CAD-modeller.</p>
         
-        <p>We are open to various collaboration models, ranging from traditional work-for-hire to investing time for potential upside. Our primary criteria for taking on new projects is the technical challenge involved.</p>
+        <p>Vi er åbne for forskellige samarbejdsmodeller, der spænder fra traditionelt konsulentarbejde til at investere tid for en potentiel økonomisk opmuntring. Vores primære kriterium for at påtage os nye projekter er den tekniske udfordring, der er involveret.</p>
         
-        <p>Over our 25+ years of experience we have transitioned from AAA game development to training ML models for image analysis back in 2016. We are full stack programmers and our core programming languages include C, C++, and Python, alongside highly optimized, low-level assembly programming and optimizing models for embedded systems. We also have experience with PCB microcontroller design and firmware development.</p>
+        <p>Gennem vores mere end 25 års erfaring har vi taget rejsen fra AAA-spiludvikling til træning af ML-modeller til billedanalyse tilbage i 2016. Vi er full-stack programmører, og vores kerneprogrammeringssprog inkluderer C, C++ og Python, kombineret med højt optimeret, low-level assembly-programmering og optimering af modeller til indlejrede systemer (embedded systems). Vi har også erfaring med PCB-mikrocontrollerdesign og firmwareudvikling.</p>
     </div>
 
     <!-- Projects Carousel Section -->
     <div class="projects-section">
-        <h2>Selected Projects</h2>
+        <h2>Udvalgte Projekter</h2>
         <div class="carousel-wrapper">
-            <button class="carousel-btn prev-btn" aria-label="Previous">‹</button>
+            <button class="carousel-btn prev-btn" aria-label="Forrige">‹</button>
             <div class="carousel-track" id="project-track">
                 
                 <div class="project-card">
                     <div class="img-wrapper">
-                        <img src="proj1.jpg" alt="Floor Plans to CAD" class="project-img">
+                        <img src="proj1.jpg" alt="Plantegninger til CAD" class="project-img">
                         <img src="MadeWithAI.jpg" class="ai-watermark" alt="Made with AI">
                     </div>
                     <div class="project-info">
-                        <h3>Floor Plans to CAD</h3>
-                        <p>System for converting hand drawn or rendered pixel based images of architectural floor plans to CAD format. This task included locating symbols Doors/Windows and the general wall structures of the floorplans. We developed an end to end AI infrastructure starting with data collection and annotation. Then the data was annotated with custom tools using foundation models for semi automated annotation. The AI models for the conversion was a combination of network architectures U-Net for segmentation and graph. ViT for elements analysis. The execution of the AI was done with a custom secure server RPC to allow for low hardware requirements for the end user. The training and server inference was done in pyTorch and the client side was done in C++.</p>
+                        <h3>Plantegninger til CAD</h3>
+                        <p>System til konvertering af håndtegnede eller renderede pixelbaserede arkitekttegninger til CAD-format. Opgaven inkluderede lokalisering af symboler (døre/vinduer) og den generelle vægstruktur. Vi udviklede en end-to-end AI-infrastruktur fra dataindsamling til annotering med specialudviklede værktøjer og foundation-modeller. AI-modellerne bestod af U-Net til segmentering/grafer samt ViT til elementanalyse. Kørte via en sikker RPC-server (PyTorch) for at minimere hardwarekrav, med klientside skrevet i C++.</p>
                     </div>
                 </div>
 
                 <div class="project-card">
                     <div class="img-wrapper">
-                        <img src="proj2.jpg" alt="Robotics RF Sensors" class="project-img">
+                        <img src="proj2.jpg" alt="RF-sensorer til Robotter" class="project-img">
                         <img src="MadeWithAI.jpg" class="ai-watermark" alt="Made with AI">
                     </div>
                     <div class="project-info">
-                        <h3>Robotics RF Sensors</h3>
-                        <p>Low latency large scale robotics RF sensors to python infrastructure. This included RF design using forward error correction (solomon reed) for ultra low glass to glass latency. The platform collected the camera and lidar data directly in GPU memory for fast inference in Python on the host computer. The sensors on the robots was a Pi CM4 with a custom sensor RF board. The infrastructure was written in C/C++ and the AI endpoint for the developers using the system in Python. The custom PCB designed in KiCad</p>
+                        <h3>RF-sensorer til Robotter</h3>
+                        <p>Lav-latens storskala RF-sensorer med Python-infrastruktur. Inkluderede RF-design med forward error correction (Reed-Solomon) for ultra-lav latens. Platformen indsamlede kamera- og lidar-data direkte i GPU-hukommelsen for hurtig inferens i Python. Sensorerne på robotterne kørte på Pi CM4 med et specialudviklet RF-printkort (KiCad). Infrastrukturen blev skrevet i C/C++ med AI-endpoint i Python.</p>
                     </div>
                 </div>
 
                 <div class="project-card">
                     <div class="img-wrapper">
-                        <img src="proj3.jpg" alt="UWB positioning system" class="project-img">
+                        <img src="proj3.jpg" alt="UWB Positioneringssystem" class="project-img">
                         <img src="MadeWithAI.jpg" class="ai-watermark" alt="Made with AI">
                     </div>
                     <div class="project-info">
-                        <h3>UWB positioning system</h3>
-                        <p>Designed PCB for base stations and tags for &lt;10cm triangulation of position for indoor robots. The system was built around an STM microcontroller and the DW3120 IC from Qorvo. We wrote custom firmware and direct integration with a Pi CM4 without any additional microcontroller. The system was mainly written in C. The custom PCB designed in KiCad</p>
+                        <h3>UWB Positioneringssystem</h3>
+                        <p>Design af printkort (KiCad) til basestationer og tags for &lt;10 cm triangulering af indendørs robotter. Bygget omkring en STM-mikrocontroller og DW3120-chippen fra Qorvo. Vi skrev specialudviklet firmware med direkte integration til en Pi CM4 uden ekstra mikrocontrollere. Systemet blev primært skrevet i C.</p>
                     </div>
                 </div>
 
                 <div class="project-card">
                     <div class="img-wrapper">
-                        <img src="proj4.jpg" alt="Large scale pose triangulation" class="project-img">
+                        <img src="proj4.jpg" alt="Fabriksgulv Triangulering" class="project-img">
                         <img src="MadeWithAI.jpg" class="ai-watermark" alt="Made with AI">
                     </div>
                     <div class="project-info">
-                        <h3>Large scale pose triangulation</h3>
-                        <p>Multicamera triangulation system for full pose 3D reconstruction for persons and robots. Based on pose ML network structure to locate body parts and robot parts to reconstruct pose and global position relative to the cameras. The system was designed to define virtual areas for automated observation. It could be for security with a check for the correct safety equipment or to validate that an entity was present in a certain location. The system was running our proprietary ML to analyze the images on the camera and the 2D pose information was then sent and triangulated on a central PC along with ROI for extended analysis. The system could potentially cover a giant area like an airport due to the embedded ML execution. The embedded system was based on NVIDIA Jetson. The inference was implemented with TensorRT.</p>
+                        <h3>Storskala Pose-Triangulering</h3>
+                        <p>Multikamerasystem til triangulering af fuld 3D-pose for personer og robotter baseret på et pose-ML-netværk til lokalisering af krops- og robotdele. Systemet definerede virtuelle områder til automatisk overvågning (f.eks. af sikkerhedsudstyr). Vores proprietære ML analyserede billeder lokalt på kameraet, hvorefter 2D-posedata blev sendt til en central pc til triangulering. Kan skaleres til store områder som lufthavne pga. indlejret eksekvering (NVIDIA Jetson / TensorRT).</p>
                     </div>
                 </div>
 
                 <div class="project-card">
                     <div class="img-wrapper">
-                        <img src="proj5.jpg" alt="Smart City" class="project-img">
+                        <img src="proj5.jpg" alt="Smart City Kamera" class="project-img">
                         <img src="MadeWithAI.jpg" class="ai-watermark" alt="Made with AI">
                     </div>
                     <div class="project-info">
                         <h3>Smart City</h3>
-                        <p>Smart city solution for counting bicycles, pedestrians and cars in a privacy by design camera that only sends anonymized data from the local camera sensor. This was implemented using NVIDIA Jetson TX2 platform. The ML model was based on the YOLO architecture. We made our own ML primitives framework for fast CPU/GPU inference. The solution included a time travel estimation that could match cars from multiple cameras with a GDPR safe embedding algorithm.</p>
+                        <p>"Privacy by design"-kamera til tælling af cykler, fodgængere og biler, der kun sender anonymiserede data. Implementeret på NVIDIA Jetson TX2 med en YOLO-arkitektur. Vi byggede vores eget ML-primitives-framework til hurtig CPU/GPU-inferens. Løsningen inkluderede tidsrejseestimering for at matche biler på tværs af kameraer via en GDPR-sikker embedding-algoritme.</p>
                     </div>
                 </div>
 
                 <div class="project-card">
                     <div class="img-wrapper">
-                        <img src="proj6.jpg" alt="Face statistics" class="project-img">
+                        <img src="proj6.jpg" alt="Ansigtsstatistik" class="project-img">
                         <img src="MadeWithAI.jpg" class="ai-watermark" alt="Made with AI">
                     </div>
                     <div class="project-info">
-                        <h3>Face statistics</h3>
-                        <p>A system to simplify keycard check-in matching facial features to identify an employee against a database. Also used for matching unknown against unknown for public traffic statistics. Custom embedded webserver for interface and entire platform including proprietary timeseries database was made in C++. The hardware was a custom embedded system with two linux units with a FPGA based inference accelerator.</p>
+                        <h3>Ansigtsstatistik</h3>
+                        <p>Et system til at forenkle nøglekorts-check-in ved at matche ansigtstræk mod en medarbejderdatabase, samt "unknown mod unknown"-matching til offentlig trafikstatistik. Inkluderede en specialudviklet indlejret webserver og en proprietær tidsseriedatabase skrevet i C++. Hardwaren var et custom indlejret system med to Linux-enheder og en FPGA-baseret inferensaccelerator.</p>
                     </div>
                 </div>
 
                 <div class="project-card">
                     <div class="img-wrapper">
-                        <img src="proj7.jpg" alt="Inner Ear Scanner" class="project-img">
+                        <img src="proj7.jpg" alt="Indre Ørescanner" class="project-img">
                     </div>
                     <div class="project-info">
-                        <h3>Inner Ear Scanner</h3>
-                        <p>Ear scanner of the inner ear with 200 microns precision for hearing aid fitting. The setup used a fiducial fixated on the head to estimate the camera's 6-DoF extrinsic pose using computer vision. The 3D point cloud generation was implemented using laser line triangulation. The triangle mesh was generated with poisson surface reconstruction and the entire pipeline was optimized from image retrieval to mesh rendering. The project was implemented in C++ and optimized with SIMD and rendered in OpenGL.</p>
+                        <h3>Indre Ørescanner</h3>
+                        <p>Ørescanner med 200 mikrometers præcision til tilpasning af høreapparater. Brugte en fikseret markør til at estimere kameraets 6-DoF-posering via computer vision. 3D-punktskyen blev genereret med laserlinje-triangulering, og mesh'et blev skabt med Poisson-overfladerekonstruktion. Hele pipelinen blev skrevet i C++, optimeret med SIMD og renderet i OpenGL.</p>
                     </div>
                 </div>
 
                 <div class="project-card">
                     <div class="img-wrapper">
-                        <img src="proj8.jpg" alt="Hitman Franchise & Glacier Engine" class="project-img">
+                        <img src="proj8.jpg" alt="Hitman-spilserien og Glacier Engine" class="project-img">
                     </div>
                     <div class="project-info">
-                        <h3>Hitman Franchise & Glacier Engine</h3>
-                        <p>Development of the Hitman series of games from Hitman: Codename 47 to Hitman: Blood Money. Part of the IOI founder group that created the franchise, characters and gameplay. Growing the company from 7-150 employees and being responsible for the sales process to EIDOS that was later sold to Square-Enix. Designing the general architecture of the first Glacier game engine and optimizing the engine for multiple consoles starting with the Sony PlayStation2. Writing optimized loops for various specialized DSP and GPU’s.</p>
+                        <h3>Hitman-serien & Glacier Engine</h3>
+                        <p>Udvikling af Hitman-spilserien fra Hitman: Codename 47 til Hitman: Blood Money. En del af grundlæggergruppen hos IOI, som skabte franchisen, karaktererne og gameplayet. Voksede virksomheden fra 7-150 medarbejdere og stod for salgsprocessen til EIDOS, der senere blev solgt til Square-Enix. Designede den overordnede arkitektur af den første Glacier-spilmotor og optimerede motoren til adskillige konsoller startende med Sony PlayStation2. Skrev optimerede løkker til forskellige specialiserede DSP'er og GPU'er.</p>
                     </div>
                 </div>
 
             </div>
-            <button class="carousel-btn next-btn" aria-label="Next">›</button>
+            <button class="carousel-btn next-btn" aria-label="Næste">›</button>
         </div>
     </div>
 
@@ -484,7 +484,7 @@
         <div class="profile">
             <img src="dg.jpg" alt="David Norden Guldbrandsen">
             <h3>David Norden Guldbrandsen</h3>
-            <h4>Serial entrepreneur and programmer with a focus on optimization and visualization.</h4>
+            <h4>Serieiværksætter og programmør med fokus på optimering og visualisering.</h4>
             <p>
                 CEO, MayFly AI<br>
                 CTO Partner, Grazper<br>
@@ -499,7 +499,7 @@
         <div class="profile">
             <img src="jh.jpg" alt="Jakob Hunsballe">
             <h3>Jakob Hunsballe</h3>
-            <h4>Master's degree in physics/astrophysics.</h4>
+            <h4>Kandidatgrad i fysik/astrofysik.</h4>
             <p>
                 CEO, Fikspunkt ApS<br>
                 Senior Programmer, Optum Computational Engineering<br>
@@ -507,7 +507,7 @@
                 Senior Programmer, Grazper<br>
                 <span class="tooltip-target">
                     Senior Programmer, Unity Technologies
-                    <span class="tooltip-text">Part of the company in the early days and growing the company to 1400 employees in 2017.</span>
+                    <span class="tooltip-text">En del af virksomheden i de tidlige dage og med til at vækste virksomheden til 1400 medarbejdere i 2017.</span>
                 </span><br>
                 Senior Programmer, Capres A/S<br>
                 Programmer, IO Interactive<br>
@@ -517,25 +517,25 @@
     </div>
 
     <div class="contact-section">
-        <h2>Contact</h2>
+        <h2>Kontakt os</h2>
         <form id="contact-form" action="https://formspree.io/f/meaqyldz" method="POST">
-            <label for="name">Name</label>
+            <label for="name">Navn</label>
             <input type="text" id="name" name="name" required>
 
-            <label for="email">Email</label>
+            <label for="email">E-mail</label>
             <input type="email" id="email" name="email" required>
 
-            <label for="message">Message</label>
+            <label for="message">Besked</label>
             <textarea id="message" name="message" rows="5" required></textarea>
 
-            <button type="submit">Send Message</button>
+            <button type="submit">Send besked</button>
             <p id="form-status"></p>
         </form>
     </div>
 
     <div class="footer">
-        <p><strong>Location:</strong><br>
-        Denmark, Copenhagen<br>
+        <p><strong>Lokation:</strong><br>
+        Danmark, København<br>
         Sværtegade 3, 2. sal i 1118 København K</p>
     </div>
 </div>
@@ -556,7 +556,7 @@
             }
         }).then(response => {
             if (response.ok) {
-                statusMessage.innerHTML = "Message sent successfully! We will get back to you soon.";
+                statusMessage.innerHTML = "Tak for din besked! Vi vender tilbage hurtigst muligt.";
                 statusMessage.style.color = "#4CAF50";
                 form.reset();
             } else {
@@ -564,13 +564,13 @@
                     if (Object.hasOwn(data, 'errors')) {
                         statusMessage.innerHTML = data["errors"].map(error => error["message"]).join(", ");
                     } else {
-                        statusMessage.innerHTML = "Oops! There was a problem sending your message.";
+                        statusMessage.innerHTML = "Hov! Der opstod et problem med at sende din besked.";
                     }
                     statusMessage.style.color = "#ff4444";
                 })
             }
         }).catch(error => {
-            statusMessage.innerHTML = "Oops! There was a problem sending your message.";
+            statusMessage.innerHTML = "Hov! Der opstod et problem med at sende din besked.";
             statusMessage.style.color = "#ff4444";
         });
     });
