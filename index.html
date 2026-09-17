@@ -616,11 +616,9 @@
         currentLang = lang;
         document.documentElement.lang = lang;
 
-        // Update active class on header links
         document.getElementById('lang-en').classList.toggle('active', lang === 'en');
         document.getElementById('lang-da').classList.toggle('active', lang === 'da');
 
-        // Swap text for all elements with data-i18n attribute
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
             if (translations[lang][key]) {
@@ -629,7 +627,6 @@
         });
     }
 
-    // Language detection via Hash (#da / #en) or browser preference
     function initLanguage() {
         const hash = window.location.hash.replace('#', '');
         if (hash === 'da' || hash === 'en') {
@@ -723,7 +720,8 @@
         container.appendChild(renderer.domElement);
 
         const light = new THREE.DirectionalLight(0xffffff, 1.25);
-        light.position.set(130, -140, 450);
+        // Placed top-left (-130, +140) so the cast shadow is projected down-right
+        light.position.set(-130, 140, 450);
         light.castShadow = true;
         light.shadow.mapSize.width = 2048;
         light.shadow.mapSize.height = 2048;
@@ -785,7 +783,8 @@
         });
 
         const MAX_RADIUS = 280;
-        const targetPos = new THREE.Vector2(130, -140);
+        // Default target matches light position (casts down-right)
+        const targetPos = new THREE.Vector2(-130, 140);
 
         function handlePointer(clientX, clientY) {
             const rect = container.getBoundingClientRect();
@@ -811,25 +810,24 @@
             }
         }, { passive: true });
 
-        // --- Android / Pixel Immediate Orientation Listener ---
+        // --- Inverted Gyroscope Orientation Handler ---
         function handleOrientation(e) {
             if (e.gamma === null && e.beta === null) return;
             const tiltX = e.gamma || 0;
             const tiltY = (e.beta || 45) - 45;
 
-            const normX = Math.max(-1, Math.min(1, tiltX / 28));
-            const normY = Math.max(-1, Math.min(1, tiltY / 28));
+            // Inverted signs so tilting reverses shadow movement
+            const normX = -Math.max(-1, Math.min(1, tiltX / 28));
+            const normY = -Math.max(-1, Math.min(1, tiltY / 28));
 
             targetPos.x = normX * MAX_RADIUS * 0.9;
             targetPos.y = -normY * MAX_RADIUS * 0.9;
         }
 
-        // Listens immediately on Android Chrome / Pixel
         if (window.DeviceOrientationEvent) {
             if (typeof DeviceOrientationEvent.requestPermission !== 'function') {
                 window.addEventListener('deviceorientation', handleOrientation);
             } else {
-                // iOS fallback
                 const unlockIOSGyro = () => {
                     DeviceOrientationEvent.requestPermission()
                         .then((state) => {
