@@ -129,7 +129,7 @@
             scroll-snap-align: center;
             display: flex;
             gap: 20px;
-            align-items: flex-start;
+            align-items: center; /* Vertically centers the image with the text on desktop */
         }
         
         .img-wrapper {
@@ -486,22 +486,21 @@
             <h3>David Norden Guldbrandsen</h3>
             <h4 data-i18n="dg_role"></h4>
             <p>
-                CEO, MayFly AI<br>
-                CTO Partner, Grazper<br>
-                CEO, TiTon ApS<br>
+                Founder &amp; CEO, MayFly AI<br>
+                Partner &amp; CTO, Grazper<br>
+                Founder &amp; CEO, TiTon ApS<br>
                 Managing Director, Haptico<br>
                 Founder, Reto-Moto<br>
-                Founder & VP, IO Interactive<br>
-                CEO, Zyrinx
+                Founder &amp; VP, IO Interactive<br>
+                Founder &amp; CEO, Zyrinx
             </p>
-        </div>
-        
+        </div>        
         <div class="profile">
             <img src="jh.jpg" alt="Jakob Hunsballe">
             <h3>Jakob Hunsballe</h3>
             <h4 data-i18n="jh_role"></h4>
             <p>
-                CEO, Fikspunkt ApS<br>
+                Founder & CEO, Fikspunkt ApS<br>
                 Senior Programmer, Optum Computational Engineering<br>
                 Founder, MayFly AI<br>
                 Senior Programmer, Grazper<br>
@@ -540,9 +539,9 @@
 
 <script>
     // --- Translation Dictionary ---
-    const translations = {
-        en: {
-            about_p1: "Otium Code is a software consultancy firm. We specialize in developing machine learning models, implementing end-to-end AI products from data collection, building annotation tools, training neural networks, and optimizing inference. Most recently, we delivered a large-scale solution converting architectural drawings into precise CAD models.",
+const translations = {
+    en: {
+            about_p1: "Otium Code is a software consultancy firm. We specialize in developing machine learning models, implementing end-to-end AI products from data collection, building annotation tools, training neural networks, and optimizing inference.",
             about_p2: "We are open to various collaboration models, ranging from traditional work-for-hire to investing time for potential upside. Our primary criteria for taking on new projects is the technical challenge involved.",
             about_p3: "Over our 25+ years of experience we have transitioned from AAA game development to training ML models for image analysis back in 2016. We are full stack programmers and our core programming languages include C, C++, and Python, alongside highly optimized, low-level assembly programming and optimizing models for embedded systems. We also have experience with PCB microcontroller design and firmware development.",
             projects_title: "Selected Projects",
@@ -573,9 +572,9 @@
             footer_text: "<strong>Location:</strong><br>Denmark, Copenhagen<br>Sværtegade 3, 2. sal i 1118 København K",
             msg_ok: "Message sent successfully! We will get back to you soon.",
             msg_err: "Oops! There was a problem sending your message."
-        },
-        da: {
-            about_p1: "Otium Code er et softwarekonsulentfirma. Vi specialiserer os i at udvikle maskinlæringsmodeller, implementere end-to-end AI-produkter fra dataindsamling, bygge annotationsværktøjer, træne neurale netværk og optimere inferens. Senest har vi leveret en storskala-løsning til konvertering af arkitekttegninger til præcise CAD-modeller.",
+    },
+    da: {
+            about_p1: "Otium Code er et softwarekonsulentfirma. Vi specialiserer os i at udvikle maskinlæringsmodeller, implementere end-to-end AI-produkter fra dataindsamling, bygge annotationsværktøjer, træne neurale netværk og optimere inferens.",            about_p1: "Otium Code er et softwarekonsulentfirma. Vi specialiserer os i at udvikle maskinlæringsmodeller, implementere end-to-end AI-produkter fra dataindsamling, bygge annotationsværktøjer, træne neurale netværk og optimere inferens.",
             about_p2: "Vi er åbne for forskellige samarbejdsmodeller, der spænder fra traditionelt konsulentarbejde til at investere tid for en potentiel økonomisk opmuntring. Vores primære kriterium for at påtage os nye projekter er den tekniske udfordring, der er involveret.",
             about_p3: "Gennem vores mere end 25 års erfaring har vi taget rejsen fra AAA-spiludvikling til træning af ML-modeller til billedanalyse tilbage i 2016. Vi er full-stack programmører, og vores kerneprogrammeringssprog inkluderer C, C++ og Python, kombineret med højt optimeret, low-level assembly-programmering og optimering af modeller til indlejrede systemer (embedded systems). Vi har også erfaring med PCB-mikrocontrollerdesign og firmwareudvikling.",
             projects_title: "Udvalgte Projekter",
