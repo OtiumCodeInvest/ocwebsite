@@ -47,7 +47,7 @@
             width: 100%;
             height: 280px;
             margin-bottom: 40px;
-            background-color: #7d7d7d;
+            background-color: #626262; /* Adjusted darker base */
             border-radius: 6px;
             border: 1px solid #333;
             overflow: hidden;
@@ -693,7 +693,8 @@
         const container = document.getElementById('logo-container');
         if (!container) return;
 
-        const BG_HEX = 0x7d7d7d;
+        // Darker grey base background
+        const BG_HEX = 0x626262;
 
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(BG_HEX);
@@ -720,7 +721,7 @@
         container.appendChild(renderer.domElement);
 
         const light = new THREE.DirectionalLight(0xffffff, 1.25);
-        // Placed top-left (-130, +140) so the cast shadow is projected down-right
+        // Start position at top-left (-130, 140) casts shadow down-right
         light.position.set(-130, 140, 450);
         light.castShadow = true;
         light.shadow.mapSize.width = 2048;
@@ -737,10 +738,11 @@
         light.shadow.normalBias = 0.04;
         scene.add(light);
 
+        // Materials: matched to slightly darker base
         const bgMat = new THREE.MeshBasicMaterial({ color: BG_HEX });
-        const logoGreyMat = new THREE.MeshBasicMaterial({ color: 0x868686, shadowSide: THREE.DoubleSide });
-        const logoGreenMat = new THREE.MeshBasicMaterial({ color: 0x78947c, shadowSide: THREE.DoubleSide });
-        const shadowCatcherMat = new THREE.ShadowMaterial({ opacity: 0.38 });
+        const logoGreyMat = new THREE.MeshBasicMaterial({ color: 0x6e6e6e, shadowSide: THREE.DoubleSide });
+        const logoGreenMat = new THREE.MeshBasicMaterial({ color: 0x647e68, shadowSide: THREE.DoubleSide });
+        const shadowCatcherMat = new THREE.ShadowMaterial({ opacity: 0.45 });
 
         const planeGeo = new THREE.PlaneGeometry(3000, 3000);
         const bgMesh = new THREE.Mesh(planeGeo, bgMat);
@@ -783,7 +785,6 @@
         });
 
         const MAX_RADIUS = 280;
-        // Default target matches light position (casts down-right)
         const targetPos = new THREE.Vector2(-130, 140);
 
         function handlePointer(clientX, clientY) {
@@ -810,15 +811,17 @@
             }
         }, { passive: true });
 
-        // --- Inverted Gyroscope Orientation Handler ---
+        // --- Comparative Gyroscope Handler ---
         function handleOrientation(e) {
             if (e.gamma === null && e.beta === null) return;
             const tiltX = e.gamma || 0;
             const tiltY = (e.beta || 45) - 45;
 
-            // Inverted signs so tilting reverses shadow movement
-            const normX = -Math.max(-1, Math.min(1, tiltX / 28));
-            const normY = -Math.max(-1, Math.min(1, tiltY / 28));
+            // Inverted for English, Normal for Danish
+            const directionMultiplier = (currentLang === 'da') ? 1 : -1;
+
+            const normX = directionMultiplier * Math.max(-1, Math.min(1, tiltX / 28));
+            const normY = directionMultiplier * Math.max(-1, Math.min(1, tiltY / 28));
 
             targetPos.x = normX * MAX_RADIUS * 0.9;
             targetPos.y = -normY * MAX_RADIUS * 0.9;
