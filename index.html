@@ -379,6 +379,7 @@
         <p data-i18n="about_p1"></p>
         <p data-i18n="about_p2"></p>
         <p data-i18n="about_p3"></p>
+        <p data-i18n="about_p4"></p>
     </div>
 
     <!-- Projects Carousel Section -->
@@ -542,9 +543,9 @@
 const translations = {
     en: {
             about_p1: "Otium Code is a software consultancy firm. We specialize in developing machine learning models, implementing end-to-end AI products from data collection, building annotation tools, training neural networks, and optimizing inference.",
-            about_p2: "We are open to various collaboration models, ranging from traditional work-for-hire to investing time for potential upside. Our primary criteria for taking on new projects is the technical challenge involved.",
-            about_p3: "Over our 25+ years of experience we have transitioned from AAA game development to training ML models for image analysis back in 2016. We are full stack programmers and our core programming languages include C, C++, and Python, alongside highly optimized, low-level assembly programming and optimizing models for embedded systems. We also have experience with PCB microcontroller design and firmware development.",
-            projects_title: "Selected Projects",
+            about_p2: "Rather than relying on off-the-shelf black boxes, we design and train tailored neural network architectures engineered from the ground up for the exact constraints, data distributions, and performance targets of your problem domain.",
+            about_p3: "We are open to various collaboration models, ranging from traditional work-for-hire to investing time for potential upside. Our primary criteria for taking on new projects is the technical challenge involved.",
+            about_p4: "Over our 25+ years of experience we have transitioned from AAA game development to training ML models for image analysis back in 2016. We are full stack programmers and our core programming languages include C, C++, and Python, alongside highly optimized, low-level assembly programming and optimizing models for embedded systems. We also have experience with PCB microcontroller design and firmware development.",            projects_title: "Selected Projects",
             p1_title: "Floor Plans to CAD",
             p1_desc: "System for converting hand drawn or rendered pixel based images of architectural floor plans to CAD format. This task included locating symbols Doors/Windows and the general wall structures of the floorplans. We developed an end to end AI infrastructure starting with data collection and annotation. Then the data was annotated with custom tools using foundation models for semi automated annotation. The AI models for the conversion was a combination of network architectures U-Net for segmentation and graph. ViT for elements analysis. The execution of the AI was done with a custom secure server RPC to allow for low hardware requirements for the end user. The training and server inference was done in pyTorch and the client side was done in C++.",
             p2_title: "Robotics RF Sensors",
@@ -574,10 +575,10 @@ const translations = {
             msg_err: "Oops! There was a problem sending your message."
     },
     da: {
-            about_p1: "Otium Code er et softwarekonsulentfirma. Vi specialiserer os i at udvikle maskinlæringsmodeller, implementere end-to-end AI-produkter fra dataindsamling, bygge annotationsværktøjer, træne neurale netværk og optimere inferens.",            about_p1: "Otium Code er et softwarekonsulentfirma. Vi specialiserer os i at udvikle maskinlæringsmodeller, implementere end-to-end AI-produkter fra dataindsamling, bygge annotationsværktøjer, træne neurale netværk og optimere inferens.",
-            about_p2: "Vi er åbne for forskellige samarbejdsmodeller, der spænder fra traditionelt konsulentarbejde til at investere tid for en potentiel økonomisk opmuntring. Vores primære kriterium for at påtage os nye projekter er den tekniske udfordring, der er involveret.",
-            about_p3: "Gennem vores mere end 25 års erfaring har vi taget rejsen fra AAA-spiludvikling til træning af ML-modeller til billedanalyse tilbage i 2016. Vi er full-stack programmører, og vores kerneprogrammeringssprog inkluderer C, C++ og Python, kombineret med højt optimeret, low-level assembly-programmering og optimering af modeller til indlejrede systemer (embedded systems). Vi har også erfaring med PCB-mikrocontrollerdesign og firmwareudvikling.",
-            projects_title: "Udvalgte Projekter",
+            about_p1: "Otium Code er et softwarekonsulentfirma. Vi specialiserer os i at udvikle maskinlæringsmodeller, implementere end-to-end AI-produkter fra dataindsamling, bygge annotationsværktøjer, træne neurale netværk og optimere inferens.",
+            about_p2: "I stedet for standard løsninger designer og træner vi skræddersyede neurale netværksarkitekturer, konstrueret fra bunden til de præcise begrænsninger, datadistributioner og driftskrav, dit domæne stiller.",
+            about_p3: "Vi er åbne for forskellige samarbejdsmodeller, der spænder fra traditionelt konsulentarbejde til at investere tid for en potentiel økonomisk opmuntring. Vores primære kriterium for at påtage os nye projekter er den tekniske udfordring, der er involveret.",
+            about_p4: "Gennem vores mere end 25 års erfaring har vi taget rejsen fra AAA-spiludvikling til træning af ML-modeller til billedanalyse tilbage i 2016. Vi er full-stack programmører, og vores kerneprogrammeringssprog inkluderer C, C++ og Python, kombineret med højt optimeret, low-level assembly-programmering og optimering af modeller til indlejrede systemer (embedded systems). Vi har også erfaring med PCB-mikrocontrollerdesign og firmwareudvikling.",            projects_title: "Udvalgte Projekter",
             p1_title: "Plantegninger til CAD",
             p1_desc: "System til konvertering af håndtegnede eller renderede pixelbaserede arkitekttegninger til CAD-format. Opgaven inkluderede lokalisering af symboler (døre/vinduer) og den generelle vægstruktur. Vi udviklede en end-to-end AI-infrastruktur fra dataindsamling til annotering med specialudviklede værktøjer og foundation-modeller. AI-modellerne bestod af U-Net til segmentering/grafer samt ViT til elementanalyse. Kørte via en sikker RPC-server (PyTorch) for at minimere hardwarekrav, med klientside skrevet i C++.",
             p2_title: "RF-sensorer til Robotter",
