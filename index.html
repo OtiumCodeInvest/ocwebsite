@@ -52,7 +52,6 @@
             border: 1px solid #333;
             overflow: hidden;
             cursor: crosshair;
-            /* Allow vertical scrolling by default so sides remain scrollable */
             touch-action: pan-y;
             user-select: none;
             -webkit-user-select: none;
@@ -563,7 +562,7 @@
             p7_desc: "Ear scanner of the inner ear with 200 microns precision for hearing aid fitting. The setup used a fiducial fixated on the head to estimate the camera's 6-DoF extrinsic pose using computer vision. The 3D point cloud generation was implemented using laser line triangulation. The triangle mesh was generated with poisson surface reconstruction and the entire pipeline was optimized from image retrieval to mesh rendering. The project was implemented in C++ and optimized with SIMD and rendered in OpenGL.",
             p8_title: "Hitman Franchise & Glacier Engine",
             p8_desc: "Development of the Hitman series of games from Hitman: Codename 47 to Hitman: Blood Money. Part of the IOI founder group that created the franchise, characters and gameplay. Growing the company from 7-150 employees and being responsible for the sales process to EIDOS that was later sold to Square-Enix. Designing the general architecture of the first Glacier game engine and optimizing the engine for multiple consoles starting with the Sony PlayStation2. Writing optimized loops for various specialized DSP and GPU’s.",
-            dg_role: "Serial entrepreneur and programmer with a focus on optimization and visualization.",
+            dg_role: "Serial entrepreneur with a background in AAA games. Has been a part of multiple successful exits.",
             jh_role: "Master's degree in physics/astrophysics.",
             jh_tooltip: "Joined as #137 and growing the company to 1400 employees in 2017.",
             contact_title: "Contact",
@@ -596,7 +595,7 @@
             p7_desc: "Ørescanner med 200 mikrometers præcision til tilpasning af høreapparater. Brugte en fikseret markør til at estimere kameraets 6-DoF-posering via computer vision. 3D-punktskyen blev genereret med laserlinje-triangulering, og mesh'et blev skabt med Poisson-overfladerekonstruktion. Hele pipelinen blev skrevet i C++, optimeret med SIMD og renderet i OpenGL.",
             p8_title: "Hitman-serien & Glacier Engine",
             p8_desc: "Udvikling af Hitman-spilserien fra Hitman: Codename 47 til Hitman: Blood Money. En del af grundlæggergruppen hos IOI, som skabte franchisen, karaktererne og gameplayet. Voksede virksomheden fra 7-150 medarbejdere og stod for salgsprocessen til EIDOS, der senere blev solgt til Square-Enix. Designede den overordnede arkitektur af den første Glacier-spilmotor og optimerede motoren til adskillige konsoller startende med Sony PlayStation2. Skrev optimerede løkker til forskellige specialiserede DSP'er og GPU'er.",
-            dg_role: "Serieiværksætter og programmør med fokus på optimering og visualisering.",
+            dg_role: "Serieiværksætter med baggrund i AAA-spil. Har været en del af flere succesfulde exits.",
             jh_role: "Kandidatgrad i fysik/astrofysik.",
             jh_tooltip: "Startede som medarbejder #137 og var med til at vækste virksomheden til 1400 medarbejdere i 2017.",
             contact_title: "Kontakt os",
@@ -804,7 +803,6 @@
 
         window.addEventListener('mousemove', (e) => handlePointer(e.clientX, e.clientY));
 
-        // Touch handling: Allow outer margins to scroll the page naturally
         let isDirectInteracting = false;
 
         container.addEventListener('touchstart', (e) => {
@@ -813,8 +811,6 @@
                 const touchX = e.touches[0].clientX - rect.left;
                 const normX = touchX / rect.width;
 
-                // Active touch control zone: central 60% of container width (0.2 to 0.8)
-                // Touching on the left 20% or right 20% leaves page scrolling completely open
                 if (normX >= 0.20 && normX <= 0.80) {
                     isDirectInteracting = true;
                     handlePointer(e.touches[0].clientX, e.touches[0].clientY);
@@ -826,7 +822,6 @@
 
         container.addEventListener('touchmove', (e) => {
             if (isDirectInteracting && e.touches.length > 0) {
-                // Prevent screen scrolling only when interacting inside the active center
                 if (e.cancelable) e.preventDefault();
                 handlePointer(e.touches[0].clientX, e.touches[0].clientY);
             }
@@ -836,7 +831,6 @@
             isDirectInteracting = false;
         }, { passive: true });
 
-        // --- Screen-Orientation-Aware Gyroscope Handler ---
         function getScreenAngle() {
             if (screen.orientation && screen.orientation.angle !== undefined) {
                 return screen.orientation.angle;
@@ -850,29 +844,23 @@
             let tiltX = e.gamma || 0;
             let tiltY = (e.beta || 45) - 45;
 
-            // Remap physical tilt axes according to current screen orientation
             const angle = getScreenAngle();
             let screenX, screenY;
 
             if (angle === 90) {
-                // Landscape (rotated 90 deg clockwise)
                 screenX = tiltY;
                 screenY = -tiltX;
             } else if (angle === -90 || angle === 270) {
-                // Landscape (rotated 90 deg counter-clockwise)
                 screenX = -tiltY;
                 screenY = tiltX;
             } else if (angle === 180) {
-                // Upside down portrait
                 screenX = -tiltX;
                 screenY = -tiltY;
             } else {
-                // Standard portrait (0 deg)
                 screenX = tiltX;
                 screenY = tiltY;
             }
 
-            // Inverted for English, Normal for Danish
             const directionMultiplier = (currentLang === 'da') ? 1 : -1;
 
             const normX = directionMultiplier * Math.max(-1, Math.min(1, screenX / 28));
