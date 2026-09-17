@@ -2,13 +2,869 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; url=en.html">
-    <script type="text/javascript">
-        window.location.href = "en.html";
-    </script>
-    <title>Redirecting...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Otium Code</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: right;
+            padding: 10px 0;
+        }
+        .header a {
+            color: #888;
+            text-decoration: none;
+            margin-left: 10px;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+        .header a.active {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        /* --- Hero Interactive Logo Section --- */
+        .logo-section {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            margin-bottom: 40px;
+            background-color: #7d7d7d;
+            border-radius: 6px;
+            border: 1px solid #333;
+            overflow: hidden;
+            cursor: crosshair;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .logo-section canvas {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* --- About Section --- */
+        .about-section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background-color: #151515;
+            border-radius: 6px;
+            border-left: 4px solid #4CAF50;
+            font-size: 1.1rem;
+        }
+        .about-section p {
+            margin-bottom: 20px;
+        }
+        .about-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* --- Projects Carousel Styles --- */
+        .projects-section {
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            background-color: #1a1a1a;
+            border-radius: 6px;
+            border: 1px solid #2a2a2a;
+            position: relative;
+        }
+        .projects-section h2 {
+            color: #fff;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+        .carousel-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .carousel-track {
+            display: flex;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            scroll-snap-type: x mandatory;
+            gap: 20px;
+            padding-bottom: 15px;
+            scrollbar-width: thin;
+            scrollbar-color: #4CAF50 #121212;
+        }
+        .carousel-track::-webkit-scrollbar {
+            height: 8px;
+        }
+        .carousel-track::-webkit-scrollbar-track {
+            background: #121212;
+            border-radius: 4px;
+        }
+        .carousel-track::-webkit-scrollbar-thumb {
+            background-color: #4CAF50;
+            border-radius: 4px;
+        }
+        .project-card {
+            flex: 0 0 calc(100% - 40px);
+            background: #222222;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 20px;
+            scroll-snap-align: center;
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+        
+        .img-wrapper {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            flex-shrink: 0;
+            overflow: hidden; 
+            border-radius: 4px;
+        }
+        .project-img {
+            width: 100%;
+            height: 100%;
+            background-color: #2a2a2a;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .ai-watermark {
+            position: absolute;
+            top: 2px;
+            left: 6px;
+            width: 90px;
+            height: auto;
+            pointer-events: none;
+            mix-blend-mode: screen; 
+            filter: sepia(100%) saturate(1000%) hue-rotate(5deg) brightness(1.1);
+        }
+        
+        .project-info {
+            flex: 1;
+        }
+        .project-info h3 {
+            margin: 0 0 10px 0;
+            color: #fff;
+            font-size: 1.2rem;
+        }
+        .project-info p {
+            margin: 0;
+            font-size: 0.95rem;
+            color: #ccc;
+            line-height: 1.5;
+        }
+        .carousel-btn {
+            background: #333;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            position: absolute;
+            z-index: 10;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+            transition: background 0.2s;
+        }
+        .carousel-btn:hover {
+            background: #4CAF50;
+        }
+        .prev-btn { left: -10px; }
+        .next-btn { right: -10px; }
+
+        /* --- Profiles Section --- */
+        .profiles {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .profile {
+            background: #171717;
+            border: 1px solid #262626;
+            padding: 25px;
+            border-radius: 6px;
+            flex: 1;
+        }
+        .profile img {
+            width: 100%;
+            max-width: 150px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: block;
+        }
+        .profile h3 {
+            margin: 0 0 5px 0;
+            color: #fff;
+        }
+        .profile h4 {
+            margin: 0 0 15px 0;
+            font-weight: 400;
+            color: #aaa;
+            font-size: 0.95rem;
+        }
+        .profile p {
+            margin-top: 0;
+            font-size: 0.95rem;
+            color: #ccc;
+            line-height: 1.5;
+        }
+
+        .tooltip-target {
+            position: relative;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .tooltip-target .tooltip-text {
+            visibility: hidden;
+            width: 220px;
+            background-color: #000;
+            color: #fff;
+            text-align: left;
+            border-radius: 4px;
+            padding: 8px 12px;
+            position: absolute;
+            z-index: 100;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+            font-size: 0.85rem;
+            line-height: 1.3;
+            border: 1px solid #4CAF50;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+        }
+        .tooltip-target .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #4CAF50 transparent transparent transparent;
+        }
+        .tooltip-target:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* --- Contact Section --- */
+        .contact-section {
+            background: #1f1f1f;
+            border: 1px solid #333;
+            padding: 30px;
+            border-radius: 6px;
+        }
+        .contact-section h2 {
+            margin-top: 0;
+            color: #fff;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        input, textarea {
+            padding: 12px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        button {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #form-status {
+            margin-top: 15px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* --- Footer Section --- */
+        .footer {
+            margin-top: 40px;
+            padding: 25px 20px;
+            background: #101010;
+            border-radius: 6px;
+            border-top: 2px solid #222;
+            text-align: center;
+            color: #888;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 768px) {
+            .carousel-btn {
+                display: none;
+            }
+            .project-card {
+                flex-direction: column;
+                flex: 0 0 90%;
+            }
+            .img-wrapper {
+                width: 100%;
+                height: 180px;
+            }
+        }
+        @media (max-width: 600px) {
+            .profiles {
+                flex-direction: column;
+            }
+            .logo-section {
+                height: 240px;
+            }
+        }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FontLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/TextGeometry.js"></script>
 </head>
 <body>
-    <p>If you are not redirected automatically, <a href="en.html">click here to visit the English site</a>.</p>
+
+<div class="container">
+    <div class="header">
+        <a href="#da" id="lang-da">Dansk</a> | 
+        <a href="#en" id="lang-en">English</a>
+    </div>
+
+    <!-- 3D Shadow Illusion Logo Canvas Container -->
+    <div class="logo-section" id="logo-container"></div>
+
+    <div class="about-section">
+        <p data-i18n="about_p1"></p>
+        <p data-i18n="about_p2"></p>
+        <p data-i18n="about_p3"></p>
+    </div>
+
+    <!-- Projects Carousel Section -->
+    <div class="projects-section">
+        <h2 data-i18n="projects_title">Selected Projects</h2>
+        <div class="carousel-wrapper">
+            <button class="carousel-btn prev-btn" aria-label="Previous">‹</button>
+            <div class="carousel-track" id="project-track">
+                
+                <div class="project-card">
+                    <div class="img-wrapper">
+                        <img src="proj1.jpg" alt="Floor Plans to CAD" class="project-img">
+                        <img src="MadeWithAI.jpg" class="ai-watermark" alt="Made with AI">
+                    </div>
+                    <div class="project-info">
+                        <h3 data-i18n="p1_title"></h3>
+                        <p data-i18n="p1_desc"></p>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="img-wrapper">
+                        <img src="proj2.jpg" alt="Robotics RF Sensors" class="project-img">
+                        <img src="MadeWithAI.jpg" class="ai-watermark" alt="Made with AI">
+                    </div>
+                    <div class="project-info">
+                        <h3 data-i18n="p2_title"></h3>
+                        <p data-i18n="p2_desc"></p>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="img-wrapper">
+                        <img src="proj3.jpg" alt="UWB positioning system" class="project-img">
+                        <img src="MadeWithAI.jpg" class="ai-watermark" alt="Made with AI">
+                    </div>
+                    <div class="project-info">
+                        <h3 data-i18n="p3_title"></h3>
+                        <p data-i18n="p3_desc"></p>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="img-wrapper">
+                        <img src="proj4.jpg" alt="Large scale pose triangulation" class="project-img">
+                        <img src="MadeWithAI.jpg" class="ai-watermark" alt="Made with AI">
+                    </div>
+                    <div class="project-info">
+                        <h3 data-i18n="p4_title"></h3>
+                        <p data-i18n="p4_desc"></p>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="img-wrapper">
+                        <img src="proj5.jpg" alt="Smart City" class="project-img">
+                        <img src="MadeWithAI.jpg" class="ai-watermark" alt="Made with AI">
+                    </div>
+                    <div class="project-info">
+                        <h3 data-i18n="p5_title"></h3>
+                        <p data-i18n="p5_desc"></p>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="img-wrapper">
+                        <img src="proj6.jpg" alt="Face statistics" class="project-img">
+                        <img src="MadeWithAI.jpg" class="ai-watermark" alt="Made with AI">
+                    </div>
+                    <div class="project-info">
+                        <h3 data-i18n="p6_title"></h3>
+                        <p data-i18n="p6_desc"></p>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="img-wrapper">
+                        <img src="proj7.jpg" alt="Inner Ear Scanner" class="project-img">
+                    </div>
+                    <div class="project-info">
+                        <h3 data-i18n="p7_title"></h3>
+                        <p data-i18n="p7_desc"></p>
+                    </div>
+                </div>
+
+                <div class="project-card">
+                    <div class="img-wrapper">
+                        <img src="proj8.jpg" alt="Hitman Franchise & Glacier Engine" class="project-img">
+                    </div>
+                    <div class="project-info">
+                        <h3 data-i18n="p8_title"></h3>
+                        <p data-i18n="p8_desc"></p>
+                    </div>
+                </div>
+
+            </div>
+            <button class="carousel-btn next-btn" aria-label="Next">›</button>
+        </div>
+    </div>
+
+    <!-- Profiles Section -->
+    <div class="profiles">
+        <div class="profile">
+            <img src="dg.jpg" alt="David Norden Guldbrandsen">
+            <h3>David Norden Guldbrandsen</h3>
+            <h4 data-i18n="dg_role"></h4>
+            <p>
+                CEO, MayFly AI<br>
+                CTO Partner, Grazper<br>
+                CEO, TiTon ApS<br>
+                Managing Director, Haptico<br>
+                Founder, Reto-Moto<br>
+                Founder & VP, IO Interactive<br>
+                CEO, Zyrinx
+            </p>
+        </div>
+        
+        <div class="profile">
+            <img src="jh.jpg" alt="Jakob Hunsballe">
+            <h3>Jakob Hunsballe</h3>
+            <h4 data-i18n="jh_role"></h4>
+            <p>
+                CEO, Fikspunkt ApS<br>
+                Senior Programmer, Optum Computational Engineering<br>
+                Founder, MayFly AI<br>
+                Senior Programmer, Grazper<br>
+                <span class="tooltip-target">
+                    Senior Programmer, Unity Technologies
+                    <span class="tooltip-text" data-i18n="jh_tooltip"></span>
+                </span><br>
+                Senior Programmer, Capres A/S<br>
+                Programmer, IO Interactive<br>
+                Programmer, WebPoint
+            </p>
+        </div>
+    </div>
+
+    <div class="contact-section">
+        <h2 data-i18n="contact_title"></h2>
+        <form id="contact-form" action="https://formspree.io/f/meaqyldz" method="POST">
+            <label for="name" data-i18n="lbl_name"></label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="email" data-i18n="lbl_email"></label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="message" data-i18n="lbl_message"></label>
+            <textarea id="message" name="message" rows="5" required></textarea>
+
+            <button type="submit" data-i18n="btn_send"></button>
+            <p id="form-status"></p>
+        </form>
+    </div>
+
+    <div class="footer">
+        <p data-i18n="footer_text"></p>
+    </div>
+</div>
+
+<script>
+    // --- Translation Dictionary ---
+    const translations = {
+        en: {
+            about_p1: "Otium Code is a software consultancy firm. We specialize in developing machine learning models, implementing end-to-end AI products from data collection, building annotation tools, training neural networks, and optimizing inference. Most recently, we delivered a large-scale solution converting architectural drawings into precise CAD models.",
+            about_p2: "We are open to various collaboration models, ranging from traditional work-for-hire to investing time for potential upside. Our primary criteria for taking on new projects is the technical challenge involved.",
+            about_p3: "Over our 25+ years of experience we have transitioned from AAA game development to training ML models for image analysis back in 2016. We are full stack programmers and our core programming languages include C, C++, and Python, alongside highly optimized, low-level assembly programming and optimizing models for embedded systems. We also have experience with PCB microcontroller design and firmware development.",
+            projects_title: "Selected Projects",
+            p1_title: "Floor Plans to CAD",
+            p1_desc: "System for converting hand drawn or rendered pixel based images of architectural floor plans to CAD format. This task included locating symbols Doors/Windows and the general wall structures of the floorplans. We developed an end to end AI infrastructure starting with data collection and annotation. Then the data was annotated with custom tools using foundation models for semi automated annotation. The AI models for the conversion was a combination of network architectures U-Net for segmentation and graph. ViT for elements analysis. The execution of the AI was done with a custom secure server RPC to allow for low hardware requirements for the end user. The training and server inference was done in pyTorch and the client side was done in C++.",
+            p2_title: "Robotics RF Sensors",
+            p2_desc: "Low latency large scale robotics RF sensors to python infrastructure. This included RF design using forward error correction (solomon reed) for ultra low glass to glass latency. The platform collected the camera and lidar data directly in GPU memory for fast inference in Python on the host computer. The sensors on the robots was a Pi CM4 with a custom sensor RF board. The infrastructure was written in C/C++ and the AI endpoint for the developers using the system in Python. The custom PCB designed in KiCad",
+            p3_title: "UWB positioning system",
+            p3_desc: "Designed PCB for base stations and tags for <10cm triangulation of position for indoor robots. The system was built around an STM microcontroller and the DW3120 IC from Qorvo. We wrote custom firmware and direct integration with a Pi CM4 without any additional microcontroller. The system was mainly written in C. The custom PCB designed in KiCad",
+            p4_title: "Large scale pose triangulation",
+            p4_desc: "Multicamera triangulation system for full pose 3D reconstruction for persons and robots. Based on pose ML network structure to locate body parts and robot parts to reconstruct pose and global position relative to the cameras. The system was designed to define virtual areas for automated observation. It could be for security with a check for the correct safety equipment or to validate that an entity was present in a certain location. The system was running our proprietary ML to analyze the images on the camera and the 2D pose information was then sent and triangulated on a central PC along with ROI for extended analysis. The system could potentially cover a giant area like an airport due to the embedded ML execution. The embedded system was based on NVIDIA Jetson. The inference was implemented with TensorRT.",
+            p5_title: "Smart City",
+            p5_desc: "Smart city solution for counting bicycles, pedestrians and cars in a privacy by design camera that only sends anonymized data from the local camera sensor. This was implemented using NVIDIA Jetson TX2 platform. The ML model was based on the YOLO architecture. We made our own ML primitives framework for fast CPU/GPU inference. The solution included a time travel estimation that could match cars from multiple cameras with a GDPR safe embedding algorithm.",
+            p6_title: "Face statistics",
+            p6_desc: "A system to simplify keycard check-in matching facial features to identify an employee against a database. Also used for matching unknown against unknown for public traffic statistics. Custom embedded webserver for interface and entire platform including proprietary timeseries database was made in C++. The hardware was a custom embedded system with two linux units with a FPGA based inference accelerator.",
+            p7_title: "Inner Ear Scanner",
+            p7_desc: "Ear scanner of the inner ear with 200 microns precision for hearing aid fitting. The setup used a fiducial fixated on the head to estimate the camera's 6-DoF extrinsic pose using computer vision. The 3D point cloud generation was implemented using laser line triangulation. The triangle mesh was generated with poisson surface reconstruction and the entire pipeline was optimized from image retrieval to mesh rendering. The project was implemented in C++ and optimized with SIMD and rendered in OpenGL.",
+            p8_title: "Hitman Franchise & Glacier Engine",
+            p8_desc: "Development of the Hitman series of games from Hitman: Codename 47 to Hitman: Blood Money. Part of the IOI founder group that created the franchise, characters and gameplay. Growing the company from 7-150 employees and being responsible for the sales process to EIDOS that was later sold to Square-Enix. Designing the general architecture of the first Glacier game engine and optimizing the engine for multiple consoles starting with the Sony PlayStation2. Writing optimized loops for various specialized DSP and GPU’s.",
+            dg_role: "Serial entrepreneur and programmer with a focus on optimization and visualization.",
+            jh_role: "Master's degree in physics/astrophysics.",
+            jh_tooltip: "Joined as #137 and growing the company to 1400 employees in 2017.",
+            contact_title: "Contact",
+            lbl_name: "Name",
+            lbl_email: "Email",
+            lbl_message: "Message",
+            btn_send: "Send Message",
+            footer_text: "<strong>Location:</strong><br>Denmark, Copenhagen<br>Sværtegade 3, 2. sal i 1118 København K",
+            msg_ok: "Message sent successfully! We will get back to you soon.",
+            msg_err: "Oops! There was a problem sending your message."
+        },
+        da: {
+            about_p1: "Otium Code er et softwarekonsulentfirma. Vi specialiserer os i at udvikle maskinlæringsmodeller, implementere end-to-end AI-produkter fra dataindsamling, bygge annotationsværktøjer, træne neurale netværk og optimere inferens. Senest har vi leveret en storskala-løsning til konvertering af arkitekttegninger til præcise CAD-modeller.",
+            about_p2: "Vi er åbne for forskellige samarbejdsmodeller, der spænder fra traditionelt konsulentarbejde til at investere tid for en potentiel økonomisk opmuntring. Vores primære kriterium for at påtage os nye projekter er den tekniske udfordring, der er involveret.",
+            about_p3: "Gennem vores mere end 25 års erfaring har vi taget rejsen fra AAA-spiludvikling til træning af ML-modeller til billedanalyse tilbage i 2016. Vi er full-stack programmører, og vores kerneprogrammeringssprog inkluderer C, C++ og Python, kombineret med højt optimeret, low-level assembly-programmering og optimering af modeller til indlejrede systemer (embedded systems). Vi har også erfaring med PCB-mikrocontrollerdesign og firmwareudvikling.",
+            projects_title: "Udvalgte Projekter",
+            p1_title: "Plantegninger til CAD",
+            p1_desc: "System til konvertering af håndtegnede eller renderede pixelbaserede arkitekttegninger til CAD-format. Opgaven inkluderede lokalisering af symboler (døre/vinduer) og den generelle vægstruktur. Vi udviklede en end-to-end AI-infrastruktur fra dataindsamling til annotering med specialudviklede værktøjer og foundation-modeller. AI-modellerne bestod af U-Net til segmentering/grafer samt ViT til elementanalyse. Kørte via en sikker RPC-server (PyTorch) for at minimere hardwarekrav, med klientside skrevet i C++.",
+            p2_title: "RF-sensorer til Robotter",
+            p2_desc: "Lav-latens storskala RF-sensorer med Python-infrastruktur. Inkluderede RF-design med forward error correction (Reed-Solomon) for ultra-lav latens. Platformen indsamlede kamera- og lidar-data direkte i GPU-hukommelsen for hurtig inferens i Python. Sensorerne på robotterne kørte på Pi CM4 med et specialudviklet RF-printkort (KiCad). Infrastrukturen blev skrevet i C/C++ med AI-endpoint i Python.",
+            p3_title: "UWB Positioneringssystem",
+            p3_desc: "Design af printkort (KiCad) til basestationer og tags for <10 cm triangulering af indendørs robotter. Bygget omkring en STM-mikrocontroller og DW3120-chippen fra Qorvo. Vi skrev specialudviklet firmware med direkte integration til en Pi CM4 uden ekstra mikrocontrollere. Systemet blev primært skrevet i C.",
+            p4_title: "Storskala Pose-Triangulering",
+            p4_desc: "Multikamerasystem til triangulering af fuld 3D-pose for personer og robotter baseret på et pose-ML-netværk til lokalisering af krops- og robotdele. Systemet definerede virtuelle områder til automatisk overvågning (f.eks. af sikkerhedsudstyr). Vores proprietære ML analyserede billeder lokalt på kameraet, hvorefter 2D-posedata blev sendt til en central pc til triangulering. Kan skaleres til store områder som lufthavne pga. indlejret eksekvering (NVIDIA Jetson / TensorRT).",
+            p5_title: "Smart City",
+            p5_desc: "“Privacy by design”-kamera til tælling af cykler, fodgængere og biler, der kun sender anonymiserede data. Implementeret på NVIDIA Jetson TX2 med en YOLO-arkitektur. Vi byggede vores eget ML-primitives-framework til hurtig CPU/GPU-inferens. Løsningen inkluderede tidsrejseestimering for at matche biler på tværs af kameraer via en GDPR-sikker embedding-algoritme.",
+            p6_title: "Ansigtsstatistik",
+            p6_desc: "Et system til at forenkle nøglekorts-check-in ved at matche ansigtstræk mod en medarbejderdatabase, samt “unknown mod unknown”-matching til offentlig trafikstatistik. Inkluderede en specialudviklet indlejret webserver og en proprietær tidsseriedatabase skrevet i C++. Hardwaren var et custom indlejret system med to Linux-enheder og en FPGA-baseret inferensaccelerator.",
+            p7_title: "Indre Ørescanner",
+            p7_desc: "Ørescanner med 200 mikrometers præcision til tilpasning af høreapparater. Brugte en fikseret markør til at estimere kameraets 6-DoF-posering via computer vision. 3D-punktskyen blev genereret med laserlinje-triangulering, og mesh'et blev skabt med Poisson-overfladerekonstruktion. Hele pipelinen blev skrevet i C++, optimeret med SIMD og renderet i OpenGL.",
+            p8_title: "Hitman-serien & Glacier Engine",
+            p8_desc: "Udvikling af Hitman-spilserien fra Hitman: Codename 47 til Hitman: Blood Money. En del af grundlæggergruppen hos IOI, som skabte franchisen, karaktererne og gameplayet. Voksede virksomheden fra 7-150 medarbejdere og stod for salgsprocessen til EIDOS, der senere blev solgt til Square-Enix. Designede den overordnede arkitektur af den første Glacier-spilmotor og optimerede motoren til adskillige konsoller startende med Sony PlayStation2. Skrev optimerede løkker til forskellige specialiserede DSP'er og GPU'er.",
+            dg_role: "Serieiværksætter og programmør med fokus på optimering og visualisering.",
+            jh_role: "Kandidatgrad i fysik/astrofysik.",
+            jh_tooltip: "Startede som medarbejder #137 og var med til at vækste virksomheden til 1400 medarbejdere i 2017.",
+            contact_title: "Kontakt os",
+            lbl_name: "Navn",
+            lbl_email: "E-mail",
+            lbl_message: "Besked",
+            btn_send: "Send besked",
+            footer_text: "<strong>Lokation:</strong><br>Danmark, København<br>Sværtegade 3, 2. sal i 1118 København K",
+            msg_ok: "Tak for din besked! Vi vender tilbage hurtigst muligt.",
+            msg_err: "Hov! Der opstod et problem med at sende din besked."
+        }
+    };
+
+    let currentLang = 'en';
+
+    function setLanguage(lang) {
+        if (!translations[lang]) lang = 'en';
+        currentLang = lang;
+        document.documentElement.lang = lang;
+
+        // Update active class on header links
+        document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+        document.getElementById('lang-da').classList.toggle('active', lang === 'da');
+
+        // Swap text for all elements with data-i18n attribute
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (translations[lang][key]) {
+                el.innerHTML = translations[lang][key];
+            }
+        });
+    }
+
+    // Language detection via Hash (#da / #en) or browser preference
+    function initLanguage() {
+        const hash = window.location.hash.replace('#', '');
+        if (hash === 'da' || hash === 'en') {
+            setLanguage(hash);
+        } else {
+            const browserLang = navigator.language.startsWith('da') ? 'da' : 'en';
+            setLanguage(browserLang);
+        }
+    }
+
+    window.addEventListener('hashchange', () => {
+        const hash = window.location.hash.replace('#', '');
+        if (hash === 'da' || hash === 'en') setLanguage(hash);
+    });
+
+    initLanguage();
+
+    // --- Contact Form Handling ---
+    var form = document.getElementById("contact-form");
+    var statusMessage = document.getElementById("form-status");
+
+    form.addEventListener("submit", function(event) {
+        event.preventDefault();
+        var data = new FormData(form);
+        fetch(form.action, {
+            method: form.method,
+            body: data,
+            headers: { 'Accept': 'application/json' }
+        }).then(response => {
+            if (response.ok) {
+                statusMessage.innerHTML = translations[currentLang].msg_ok;
+                statusMessage.style.color = "#4CAF50";
+                form.reset();
+            } else {
+                statusMessage.innerHTML = translations[currentLang].msg_err;
+                statusMessage.style.color = "#ff4444";
+            }
+        }).catch(error => {
+            statusMessage.innerHTML = translations[currentLang].msg_err;
+            statusMessage.style.color = "#ff4444";
+        });
+    });
+
+    // --- Carousel Handling ---
+    document.addEventListener("DOMContentLoaded", function() {
+        const track = document.getElementById('project-track');
+        const prevBtn = document.querySelector('.prev-btn');
+        const nextBtn = document.querySelector('.next-btn');
+
+        if (track && prevBtn && nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                const scrollAmount = track.querySelector('.project-card').offsetWidth + 20;
+                track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            });
+            prevBtn.addEventListener('click', () => {
+                const scrollAmount = track.querySelector('.project-card').offsetWidth + 20;
+                track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            });
+        }
+    });
+
+    // --- Three.js Dynamic Shadow Logo Implementation ---
+    (function() {
+        const container = document.getElementById('logo-container');
+        if (!container) return;
+
+        const BG_HEX = 0x7d7d7d;
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(BG_HEX);
+
+        const viewHeight = 440;
+        let aspect = container.clientWidth / container.clientHeight;
+
+        const camera = new THREE.OrthographicCamera(
+            (-aspect * viewHeight) / 2,
+            (aspect * viewHeight) / 2,
+            viewHeight / 2,
+            -viewHeight / 2,
+            1,
+            2500
+        );
+        camera.position.set(0, 0, 1000);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container.appendChild(renderer.domElement);
+
+        const light = new THREE.DirectionalLight(0xffffff, 1.25);
+        light.position.set(130, -140, 450);
+        light.castShadow = true;
+        light.shadow.mapSize.width = 2048;
+        light.shadow.mapSize.height = 2048;
+        light.shadow.camera.near = 50;
+        light.shadow.camera.far = 1400;
+
+        const shadowBounds = 400;
+        light.shadow.camera.left = -shadowBounds;
+        light.shadow.camera.right = shadowBounds;
+        light.shadow.camera.top = shadowBounds;
+        light.shadow.camera.bottom = -shadowBounds;
+        light.shadow.bias = -0.00005;
+        light.shadow.normalBias = 0.04;
+        scene.add(light);
+
+        const bgMat = new THREE.MeshBasicMaterial({ color: BG_HEX });
+        const logoGreyMat = new THREE.MeshBasicMaterial({ color: 0x868686, shadowSide: THREE.DoubleSide });
+        const logoGreenMat = new THREE.MeshBasicMaterial({ color: 0x78947c, shadowSide: THREE.DoubleSide });
+        const shadowCatcherMat = new THREE.ShadowMaterial({ opacity: 0.38 });
+
+        const planeGeo = new THREE.PlaneGeometry(3000, 3000);
+        const bgMesh = new THREE.Mesh(planeGeo, bgMat);
+        scene.add(bgMesh);
+
+        const shadowPlane = new THREE.Mesh(planeGeo, shadowCatcherMat);
+        shadowPlane.position.set(0, 0, 0.4);
+        shadowPlane.receiveShadow = true;
+        scene.add(shadowPlane);
+
+        const fontLoader = new THREE.FontLoader();
+        fontLoader.load('https://threejs.org/examples/fonts/helvetiker_bold.typeface.json', (font) => {
+            function createCenteredText(text, size, height, letterSpacing, material) {
+                const textGeo = new THREE.TextGeometry(text, {
+                    font: font,
+                    size: size,
+                    height: height,
+                    curveSegments: 8,
+                    bevelEnabled: false,
+                    letterSpacing: letterSpacing
+                });
+                textGeo.computeBoundingBox();
+                const cx = (textGeo.boundingBox.max.x + textGeo.boundingBox.min.x) / 2;
+                const cy = (textGeo.boundingBox.max.y + textGeo.boundingBox.min.y) / 2;
+                textGeo.translate(-cx, -cy, 0);
+
+                const mesh = new THREE.Mesh(textGeo, material);
+                mesh.castShadow = true;
+                mesh.receiveShadow = false;
+                return mesh;
+            }
+
+            const otiumMesh = createCenteredText('OTIUM', 105, 100, 0, logoGreyMat);
+            otiumMesh.position.set(0, 26, -50);
+            scene.add(otiumMesh);
+
+            const codeMesh = createCenteredText('CODE', 34, 80, 4.5, logoGreenMat);
+            codeMesh.position.set(0, -68, -50);
+            scene.add(codeMesh);
+        });
+
+        const MAX_RADIUS = 280;
+        const targetPos = new THREE.Vector2(130, -140);
+
+        function handlePointer(clientX, clientY) {
+            const rect = container.getBoundingClientRect();
+            const relX = clientX - rect.left;
+            const relY = clientY - rect.top;
+
+            const rawX = ((relX / rect.width) * 2 - 1) * ((aspect * viewHeight) / 2);
+            const rawY = (-(relY / rect.height) * 2 + 1) * (viewHeight / 2);
+
+            const dist = Math.hypot(rawX, rawY);
+            if (dist > 0) {
+                const compressedDist = MAX_RADIUS * (dist / (dist + MAX_RADIUS * 0.7));
+                const scale = compressedDist / dist;
+                targetPos.x = rawX * scale;
+                targetPos.y = rawY * scale;
+            }
+        }
+
+        window.addEventListener('mousemove', (e) => handlePointer(e.clientX, e.clientY));
+        container.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                handlePointer(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, { passive: true });
+
+        // --- Android / Pixel Immediate Orientation Listener ---
+        function handleOrientation(e) {
+            if (e.gamma === null && e.beta === null) return;
+            const tiltX = e.gamma || 0;
+            const tiltY = (e.beta || 45) - 45;
+
+            const normX = Math.max(-1, Math.min(1, tiltX / 28));
+            const normY = Math.max(-1, Math.min(1, tiltY / 28));
+
+            targetPos.x = normX * MAX_RADIUS * 0.9;
+            targetPos.y = -normY * MAX_RADIUS * 0.9;
+        }
+
+        // Listens immediately on Android Chrome / Pixel
+        if (window.DeviceOrientationEvent) {
+            if (typeof DeviceOrientationEvent.requestPermission !== 'function') {
+                window.addEventListener('deviceorientation', handleOrientation);
+            } else {
+                // iOS fallback
+                const unlockIOSGyro = () => {
+                    DeviceOrientationEvent.requestPermission()
+                        .then((state) => {
+                            if (state === 'granted') {
+                                window.addEventListener('deviceorientation', handleOrientation);
+                            }
+                        })
+                        .catch(console.error);
+                };
+                window.addEventListener('pointerdown', unlockIOSGyro, { once: true, passive: true });
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            light.position.x += (targetPos.x - light.position.x) * 0.12;
+            light.position.y += (targetPos.y - light.position.y) * 0.12;
+            light.target.position.set(0, 0, 0);
+            light.target.updateMatrixWorld();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            aspect = container.clientWidth / container.clientHeight;
+            camera.left = (-aspect * viewHeight) / 2;
+            camera.right = (aspect * viewHeight) / 2;
+            camera.top = viewHeight / 2;
+            camera.bottom = -viewHeight / 2;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+    })();
+</script>
+
 </body>
 </html>
