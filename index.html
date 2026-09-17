@@ -47,12 +47,13 @@
             width: 100%;
             height: 280px;
             margin-bottom: 40px;
-            background-color: #626262; /* Adjusted darker base */
+            background-color: #626262;
             border-radius: 6px;
             border: 1px solid #333;
             overflow: hidden;
             cursor: crosshair;
-            touch-action: none;
+            /* Allow vertical scrolling by default so sides remain scrollable */
+            touch-action: pan-y;
             user-select: none;
             -webkit-user-select: none;
         }
@@ -693,7 +694,6 @@
         const container = document.getElementById('logo-container');
         if (!container) return;
 
-        // Darker grey base background
         const BG_HEX = 0x626262;
 
         const scene = new THREE.Scene();
@@ -721,7 +721,6 @@
         container.appendChild(renderer.domElement);
 
         const light = new THREE.DirectionalLight(0xffffff, 1.25);
-        // Start position at top-left (-130, 140) casts shadow down-right
         light.position.set(-130, 140, 450);
         light.castShadow = true;
         light.shadow.mapSize.width = 2048;
@@ -738,7 +737,6 @@
         light.shadow.normalBias = 0.04;
         scene.add(light);
 
-        // Materials: matched to slightly darker base
         const bgMat = new THREE.MeshBasicMaterial({ color: BG_HEX });
         const logoGreyMat = new THREE.MeshBasicMaterial({ color: 0x6e6e6e, shadowSide: THREE.DoubleSide });
         const logoGreenMat = new THREE.MeshBasicMaterial({ color: 0x647e68, shadowSide: THREE.DoubleSide });
@@ -805,23 +803,80 @@
         }
 
         window.addEventListener('mousemove', (e) => handlePointer(e.clientX, e.clientY));
-        container.addEventListener('touchmove', (e) => {
+
+        // Touch handling: Allow outer margins to scroll the page naturally
+        let isDirectInteracting = false;
+
+        container.addEventListener('touchstart', (e) => {
             if (e.touches.length > 0) {
-                handlePointer(e.touches[0].clientX, e.touches[0].clientY);
+                const rect = container.getBoundingClientRect();
+                const touchX = e.touches[0].clientX - rect.left;
+                const normX = touchX / rect.width;
+
+                // Active touch control zone: central 60% of container width (0.2 to 0.8)
+                // Touching on the left 20% or right 20% leaves page scrolling completely open
+                if (normX >= 0.20 && normX <= 0.80) {
+                    isDirectInteracting = true;
+                    handlePointer(e.touches[0].clientX, e.touches[0].clientY);
+                } else {
+                    isDirectInteracting = false;
+                }
             }
         }, { passive: true });
 
-        // --- Comparative Gyroscope Handler ---
+        container.addEventListener('touchmove', (e) => {
+            if (isDirectInteracting && e.touches.length > 0) {
+                // Prevent screen scrolling only when interacting inside the active center
+                if (e.cancelable) e.preventDefault();
+                handlePointer(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, { passive: false });
+
+        window.addEventListener('touchend', () => {
+            isDirectInteracting = false;
+        }, { passive: true });
+
+        // --- Screen-Orientation-Aware Gyroscope Handler ---
+        function getScreenAngle() {
+            if (screen.orientation && screen.orientation.angle !== undefined) {
+                return screen.orientation.angle;
+            }
+            return window.orientation || 0;
+        }
+
         function handleOrientation(e) {
             if (e.gamma === null && e.beta === null) return;
-            const tiltX = e.gamma || 0;
-            const tiltY = (e.beta || 45) - 45;
+
+            let tiltX = e.gamma || 0;
+            let tiltY = (e.beta || 45) - 45;
+
+            // Remap physical tilt axes according to current screen orientation
+            const angle = getScreenAngle();
+            let screenX, screenY;
+
+            if (angle === 90) {
+                // Landscape (rotated 90 deg clockwise)
+                screenX = tiltY;
+                screenY = -tiltX;
+            } else if (angle === -90 || angle === 270) {
+                // Landscape (rotated 90 deg counter-clockwise)
+                screenX = -tiltY;
+                screenY = tiltX;
+            } else if (angle === 180) {
+                // Upside down portrait
+                screenX = -tiltX;
+                screenY = -tiltY;
+            } else {
+                // Standard portrait (0 deg)
+                screenX = tiltX;
+                screenY = tiltY;
+            }
 
             // Inverted for English, Normal for Danish
             const directionMultiplier = (currentLang === 'da') ? 1 : -1;
 
-            const normX = directionMultiplier * Math.max(-1, Math.min(1, tiltX / 28));
-            const normY = directionMultiplier * Math.max(-1, Math.min(1, tiltY / 28));
+            const normX = directionMultiplier * Math.max(-1, Math.min(1, screenX / 28));
+            const normY = directionMultiplier * Math.max(-1, Math.min(1, screenY / 28));
 
             targetPos.x = normX * MAX_RADIUS * 0.9;
             targetPos.y = -normY * MAX_RADIUS * 0.9;
