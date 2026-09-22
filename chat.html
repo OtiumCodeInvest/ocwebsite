@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Otium Code — AI Chat</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background: #181818;
+            border-bottom: 1px solid #282828;
+        }
+
+        .header a {
+            color: #888;
+            text-decoration: none;
+            font-size: 0.95em;
+        }
+
+        .header a:hover {
+            color: #fff;
+        }
+
+        .logo-title {
+            font-family: "Leelawadee UI Bold", "Leelawadee Bold", "Leelawadee UI", Leelawadee, -apple-system, sans-serif;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 1.2rem;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+
+        /* --- Chat Main Container --- */
+        .chat-container {
+            flex: 1;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 20px 15px 0 15px;
+            box-sizing: border-box;
+        }
+
+        .history-container {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            scrollbar-width: thin;
+            scrollbar-color: #4CAF50 #121212;
+        }
+
+        .history-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .history-container::-webkit-scrollbar-track {
+            background: #121212;
+        }
+        .history-container::-webkit-scrollbar-thumb {
+            background-color: #4CAF50;
+            border-radius: 3px;
+        }
+
+        /* Message Bubbles */
+        .message {
+            display: flex;
+            flex-direction: column;
+            max-width: 85%;
+            padding: 14px 18px;
+            border-radius: 6px;
+            line-height: 1.5;
+            font-size: 0.98rem;
+            word-wrap: break-word;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background-color: #222222;
+            border: 1px solid #333;
+            color: #ffffff;
+            border-bottom-right-radius: 1px;
+        }
+
+        .message.assistant {
+            align-self: flex-start;
+            background-color: #171717;
+            border: 1px solid #262626;
+            border-left: 3px solid #4CAF50;
+            color: #e0e0e0;
+            border-bottom-left-radius: 1px;
+        }
+
+        .message .role-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            color: #888;
+            font-weight: 600;
+        }
+
+        .message.user .role-label {
+            color: #4CAF50;
+        }
+
+        /* --- Input Area --- */
+        .input-wrapper {
+            padding: 20px 0;
+            background-color: #121212;
+        }
+
+        .input-box {
+            display: flex;
+            align-items: flex-end;
+            background: #1f1f1f;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 8px 12px;
+            gap: 10px;
+            transition: border-color 0.2s ease;
+        }
+
+        .input-box:focus-within {
+            border-color: #4CAF50;
+        }
+
+        textarea {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: none;
+            max-height: 150px;
+            outline: none;
+            line-height: 1.4;
+            padding: 6px 0;
+        }
+
+        /* Upward Arrow Send Button */
+        .send-btn {
+            background-color: #4CAF50;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease, opacity 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .send-btn:hover {
+            background-color: #45a049;
+        }
+
+        .send-btn:disabled {
+            background-color: #333;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .send-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        /* Typing indicator */
+        .cursor-blink {
+            display: inline-block;
+            width: 8px;
+            height: 15px;
+            background-color: #4CAF50;
+            margin-left: 4px;
+            animation: blink 0.8s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <a href="en.html">← Back to Site</a>
+        <div class="logo-title">Otium Code AI</div>
+        <div></div>
+    </div>
+
+    <div class="chat-container">
+        <!-- Conversation History -->
+        <div class="history-container" id="chat-history">
+            <div class="message assistant">
+                <div class="role-label">System</div>
+                <div>Hello! How can I assist you with your project or code today?</div>
+            </div>
+        </div>
+
+        <!-- Input Section -->
+        <div class="input-wrapper">
+            <div class="input-box">
+                <textarea id="prompt-input" rows="1" placeholder="Type a message..."></textarea>
+                <button id="send-btn" class="send-btn" aria-label="Send message">
+                    <!-- Upward Arrow Icon -->
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 4l-7 7h4v9h6v-9h4l-7-7z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+// Update endpoint to match your HTTPS server address
+        const BACKEND_URL = "https://sg.otiumcode.com:9010/api/chat";
+        //const BACKEND_URL = "https://sg.otiumcode.com/api/chat";
+        //const BACKEND_URL = "https://sg.otiumcode.com:9010/api/chat";
+        //const BACKEND_URL = "http://sg.otiumcode.com:9010/api/chat";
+
+        const historyContainer = document.getElementById('chat-history');
+        const promptInput = document.getElementById('prompt-input');
+        const sendBtn = document.getElementById('send-btn');
+
+        // Auto-expand textarea
+        promptInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        // Enter key submits (Shift+Enter adds new line)
+        promptInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        sendBtn.addEventListener('click', sendMessage);
+
+        async function sendMessage() {
+            const prompt = promptInput.value.trim();
+            if (!prompt) return;
+
+            // 1. Append User Message
+            appendMessage('user', 'You', prompt);
+            promptInput.value = '';
+            promptInput.style.height = 'auto';
+            setLoading(true);
+
+            // 2. Append Assistant Message Placeholder
+            const assistantMsgDiv = appendMessage('assistant', 'Otium AI', '');
+            const contentDiv = assistantMsgDiv.querySelector('.message-body');
+            
+            // Add cursor
+            const cursor = document.createElement('span');
+            cursor.className = 'cursor-blink';
+            contentDiv.appendChild(cursor);
+
+            try {
+                // 3. Initiate SSE Streaming Request to Python Backend
+                const response = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value, { stream: true });
+                    // Remove cursor, append chunk, re-add cursor
+                    cursor.remove();
+                    contentDiv.innerText += chunk;
+                    contentDiv.appendChild(cursor);
+                    
+                    scrollToBottom();
+                }
+
+            } catch (err) {
+                cursor.remove();
+                contentDiv.innerText += `\n[Error: Could not establish secure connection to GPU inference server.]`;
+                console.error(err);
+            } finally {
+                cursor.remove();
+                setLoading(false);
+                scrollToBottom();
+            }
+        }
+
+        function appendMessage(role, label, text) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${role}`;
+            
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'role-label';
+            labelDiv.innerText = label;
+
+            const bodyDiv = document.createElement('div');
+            bodyDiv.className = 'message-body';
+            bodyDiv.innerText = text;
+
+            msgDiv.appendChild(labelDiv);
+            msgDiv.appendChild(bodyDiv);
+            historyContainer.appendChild(msgDiv);
+
+            scrollToBottom();
+            return msgDiv;
+        }
+
+        function scrollToBottom() {
+            historyContainer.scrollTop = historyContainer.scrollHeight;
+        }
+
+        function setLoading(isLoading) {
+            sendBtn.disabled = isLoading;
+            promptInput.disabled = isLoading;
+        }
+    </script>
+</body>
+</html>
