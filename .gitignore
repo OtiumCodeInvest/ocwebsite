@@ -1,3 +1,4 @@
 .vs
 *.pem
 env
+__pycache__

@@ -44,6 +44,26 @@
             letter-spacing: 1px;
         }
 
+        /* --- Header Token Toggle Control --- */
+        .token-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: #888;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .token-toggle input {
+            cursor: pointer;
+            accent-color: #4CAF50;
+        }
+
+        .token-toggle:hover {
+            color: #e0e0e0;
+        }
+
         /* --- Chat Main Container --- */
         .chat-container {
             flex: 1;
@@ -209,7 +229,10 @@
     <div class="header">
         <a href="en.html">← Back to Site</a>
         <div class="logo-title">Otium Code AI</div>
-        <div></div>
+        <label class="token-toggle" title="Show or hide special control tokens like <|assistant_end|>">
+            <input type="checkbox" id="toggle-special-tokens">
+            <span>Show Special Tokens</span>
+        </label>
     </div>
 
     <div class="chat-container">
@@ -217,7 +240,7 @@
         <div class="history-container" id="chat-history">
             <div class="message assistant">
                 <div class="role-label">System</div>
-                <div>Hello! How can I assist you with your project or code today?</div>
+                <div class="message-body">Hello! How can I assist you with your project or code today?</div>
             </div>
         </div>
 
@@ -236,15 +259,32 @@
     </div>
 
     <script>
-// Update endpoint to match your HTTPS server address
         const BACKEND_URL = "https://sg.otiumcode.com:9010/api/chat";
-        //const BACKEND_URL = "https://sg.otiumcode.com/api/chat";
-        //const BACKEND_URL = "https://sg.otiumcode.com:9010/api/chat";
-        //const BACKEND_URL = "http://sg.otiumcode.com:9010/api/chat";
 
         const historyContainer = document.getElementById('chat-history');
         const promptInput = document.getElementById('prompt-input');
         const sendBtn = document.getElementById('send-btn');
+        const toggleTokensCheckbox = document.getElementById('toggle-special-tokens');
+
+        // Regex matching common NanoChat / Special Tokens
+        const SPECIAL_TOKENS_REGEX = /<\|(user_start|user_end|assistant_start|assistant_end|system|bos|eos)\|>/g;
+
+        // Re-render message texts when user toggles the checkbox
+        toggleTokensCheckbox.addEventListener('change', () => {
+            const messages = historyContainer.querySelectorAll('.message-body');
+            messages.forEach(body => {
+                if (body.dataset.rawText) {
+                    body.innerText = formatText(body.dataset.rawText);
+                }
+            });
+        });
+
+        function formatText(text) {
+            if (toggleTokensCheckbox.checked) {
+                return text; // Show raw text including special tokens
+            }
+            return text.replace(SPECIAL_TOKENS_REGEX, '').trim();
+        }
 
         // Auto-expand textarea
         promptInput.addEventListener('input', function() {
@@ -276,6 +316,8 @@
             const assistantMsgDiv = appendMessage('assistant', 'Otium AI', '');
             const contentDiv = assistantMsgDiv.querySelector('.message-body');
             
+            let rawAccumulatedText = "";
+
             // Add cursor
             const cursor = document.createElement('span');
             cursor.className = 'cursor-blink';
@@ -301,9 +343,14 @@
                     if (done) break;
 
                     const chunk = decoder.decode(value, { stream: true });
-                    // Remove cursor, append chunk, re-add cursor
+                    rawAccumulatedText += chunk;
+
+                    // Save raw unformatted text to data attribute
+                    contentDiv.dataset.rawText = rawAccumulatedText;
+
+                    // Remove cursor, format text according to checkbox state, re-add cursor
                     cursor.remove();
-                    contentDiv.innerText += chunk;
+                    contentDiv.innerText = formatText(rawAccumulatedText);
                     contentDiv.appendChild(cursor);
                     
                     scrollToBottom();
@@ -311,7 +358,9 @@
 
             } catch (err) {
                 cursor.remove();
-                contentDiv.innerText += `\n[Error: Could not establish secure connection to GPU inference server.]`;
+                rawAccumulatedText += `\n[Error: Could not establish secure connection to GPU inference server.]`;
+                contentDiv.dataset.rawText = rawAccumulatedText;
+                contentDiv.innerText = formatText(rawAccumulatedText);
                 console.error(err);
             } finally {
                 cursor.remove();
@@ -330,7 +379,8 @@
 
             const bodyDiv = document.createElement('div');
             bodyDiv.className = 'message-body';
-            bodyDiv.innerText = text;
+            bodyDiv.dataset.rawText = text;
+            bodyDiv.innerText = formatText(text);
 
             msgDiv.appendChild(labelDiv);
             msgDiv.appendChild(bodyDiv);

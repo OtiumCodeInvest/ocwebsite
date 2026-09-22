@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>cd1162a9-b515-4807-ac76-17973214640d</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>chatagent.py</StartupFile>
+    <StartupFile>nanochatagent.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -23,6 +23,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="chatagent.py" />
+    <Compile Include="chat_cli.py" />
+    <Compile Include="nanochatagent.py" />
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="env\">
