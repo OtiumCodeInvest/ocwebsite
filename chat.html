@@ -20,36 +20,93 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 25px;
+            padding: 10px 20px;
             background: #181818;
             border-bottom: 1px solid #282828;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
-        .header a {
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-left a {
             color: #888;
             text-decoration: none;
-            font-size: 0.95em;
+            font-size: 0.9em;
         }
 
-        .header a:hover {
+        .header-left a:hover {
             color: #fff;
         }
 
         .logo-title {
-            font-family: "Leelawadee UI Bold", "Leelawadee Bold", "Leelawadee UI", Leelawadee, -apple-system, sans-serif;
+            font-family: "Leelawadee UI Bold", "Leelawadee Bold", sans-serif;
             font-weight: 900;
             text-transform: uppercase;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: #fff;
             letter-spacing: 1px;
         }
 
-        /* --- Header Token Toggle Control --- */
-        .token-toggle {
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* --- Live Detailed Token Usage Pill --- */
+        .token-badge {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 0.85rem;
+            font-family: monospace;
+            font-size: 0.80rem;
+            background: #202020;
+            padding: 5px 10px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            color: #aaa;
+        }
+
+        .token-badge .val { color: #4CAF50; font-weight: bold; }
+        .token-badge .sep { color: #555; }
+
+        /* --- Buttons --- */
+        .btn-action {
+            background-color: transparent;
+            color: #aaa;
+            border: 1px solid #333;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-action:hover {
+            background-color: #222;
+            color: #fff;
+            border-color: #555;
+        }
+
+        .reset-btn:hover {
+            color: #ff5252;
+            border-color: #552222;
+        }
+
+        .token-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
             color: #888;
             cursor: pointer;
             user-select: none;
@@ -58,10 +115,6 @@
         .token-toggle input {
             cursor: pointer;
             accent-color: #4CAF50;
-        }
-
-        .token-toggle:hover {
-            color: #e0e0e0;
         }
 
         /* --- Chat Main Container --- */
@@ -88,18 +141,6 @@
             scrollbar-color: #4CAF50 #121212;
         }
 
-        .history-container::-webkit-scrollbar {
-            width: 6px;
-        }
-        .history-container::-webkit-scrollbar-track {
-            background: #121212;
-        }
-        .history-container::-webkit-scrollbar-thumb {
-            background-color: #4CAF50;
-            border-radius: 3px;
-        }
-
-        /* Message Bubbles */
         .message {
             display: flex;
             flex-direction: column;
@@ -176,7 +217,6 @@
             padding: 6px 0;
         }
 
-        /* Upward Arrow Send Button */
         .send-btn {
             background-color: #4CAF50;
             color: #ffffff;
@@ -188,27 +228,14 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: background-color 0.2s ease, opacity 0.2s ease;
+            transition: background-color 0.2s ease;
             flex-shrink: 0;
         }
 
-        .send-btn:hover {
-            background-color: #45a049;
-        }
+        .send-btn:hover { background-color: #45a049; }
+        .send-btn:disabled { background-color: #333; color: #666; cursor: not-allowed; }
+        .send-btn svg { width: 20px; height: 20px; fill: currentColor; }
 
-        .send-btn:disabled {
-            background-color: #333;
-            color: #666;
-            cursor: not-allowed;
-        }
-
-        .send-btn svg {
-            width: 20px;
-            height: 20px;
-            fill: currentColor;
-        }
-
-        /* Typing indicator */
         .cursor-blink {
             display: inline-block;
             width: 8px;
@@ -218,25 +245,86 @@
             animation: blink 0.8s infinite;
         }
 
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* --- Modal Styles --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
         }
+
+        .modal {
+            background: #1c1c1c;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 24px;
+            width: 90%;
+            max-width: 480px;
+            color: #e0e0e0;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #282828;
+            padding-bottom: 8px;
+        }
+
+        .modal-header h3 { margin: 0; color: #fff; font-size: 1.1rem; }
+        .modal-close {
+            background: none; border: none; color: #888; font-size: 1.2rem; cursor: pointer;
+        }
+        .modal-close:hover { color: #fff; }
+
+        .info-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        .info-table td { padding: 6px 0; border-bottom: 1px solid #242424; }
+        .info-table td:first-child { color: #888; }
+        .info-table td:last-child { text-align: right; font-family: monospace; color: #4CAF50; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <a href="en.html">← Back to Site</a>
-        <div class="logo-title">Otium Code AI</div>
-        <label class="token-toggle" title="Show or hide special control tokens like <|assistant_end|>">
-            <input type="checkbox" id="toggle-special-tokens">
-            <span>Show Special Tokens</span>
-        </label>
+        <div class="header-left">
+            <a href="en.html">← Back to Site</a>
+            <div class="logo-title">Otium Code AI</div>
+        </div>
+        <div class="header-right">
+            <!-- Detailed Token badge -->
+            <div id="token-display" class="token-badge" title="Context Token Breakdown">
+                <span>Context: <span id="tok-total" class="val">1</span>/2048</span>
+                <span class="sep">|</span>
+                <span>In: <span id="tok-in" class="val">0</span>/1280</span>
+                <span class="sep">|</span>
+                <span>Out: <span id="tok-out" class="val">0</span>/768</span>
+            </div>
+
+            <!-- Info button -->
+            <button id="info-btn" class="btn-action" title="View Model Architecture and Spec">
+                ⓘ Info
+            </button>
+
+            <!-- Reset Chat button -->
+            <button id="reset-btn" class="btn-action reset-btn" title="Clear conversation context">
+                ↻ Reset
+            </button>
+
+            <label class="token-toggle" title="Show or hide special control tags">
+                <input type="checkbox" id="toggle-special-tokens">
+                <span>Tags</span>
+            </label>
+        </div>
     </div>
 
     <div class="chat-container">
-        <!-- Conversation History -->
         <div class="history-container" id="chat-history">
             <div class="message assistant">
                 <div class="role-label">System</div>
@@ -244,32 +332,124 @@
             </div>
         </div>
 
-        <!-- Input Section -->
         <div class="input-wrapper">
             <div class="input-box">
                 <textarea id="prompt-input" rows="1" placeholder="Type a message..."></textarea>
                 <button id="send-btn" class="send-btn" aria-label="Send message">
-                    <!-- Upward Arrow Icon -->
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 4l-7 7h4v9h6v-9h4l-7-7z"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 4l-7 7h4v9h6v-9h4l-7-7z"/></svg>
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- Info Modal -->
+    <div id="info-modal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Model & Inference Information</h3>
+                <button id="modal-close-btn" class="modal-close">✕</button>
+            </div>
+            <table class="info-table" id="info-table-body">
+                <tr><td>Model Name</td><td id="m-name">Loading...</td></tr>
+                <tr><td>Parameter Count</td><td id="m-params">-</td></tr>
+                <tr><td>Layers / Depth</td><td id="m-layers">-</td></tr>
+                <tr><td>Embedding Dim</td><td id="m-dim">-</td></tr>
+                <tr><td>Attention Heads</td><td id="m-heads">-</td></tr>
+                <tr><td>Total Context Limit</td><td id="m-context">-</td></tr>
+                <tr><td>Input Prompt Budget</td><td id="m-in-budget">-</td></tr>
+                <tr><td>Generation Buffer</td><td id="m-out-budget">-</td></tr>
+                <tr><td>Inference Device</td><td id="m-gpu">-</td></tr>
+            </table>
+        </div>
+    </div>
+
     <script>
-        const BACKEND_URL = "https://sg.otiumcode.com:9010/api/chat";
+        const BASE_API = "https://sg.otiumcode.com:9010";
+
+        let sessionId = sessionStorage.getItem("nanochat_session_id");
+        if (!sessionId) {
+            sessionId = "sess_" + Math.random().toString(36).substring(2, 11) + "_" + Date.now();
+            sessionStorage.setItem("nanochat_session_id", sessionId);
+        }
 
         const historyContainer = document.getElementById('chat-history');
         const promptInput = document.getElementById('prompt-input');
         const sendBtn = document.getElementById('send-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const infoBtn = document.getElementById('info-btn');
+        const infoModal = document.getElementById('info-modal');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+
+        const tokTotal = document.getElementById('tok-total');
+        const tokIn = document.getElementById('tok-in');
+        const tokOut = document.getElementById('tok-out');
         const toggleTokensCheckbox = document.getElementById('toggle-special-tokens');
 
-        // Regex matching common NanoChat / Special Tokens
-        const SPECIAL_TOKENS_REGEX = /<\|(user_start|user_end|assistant_start|assistant_end|system|bos|eos)\|>/g;
+        const SPECIAL_TOKENS_REGEX = /<\|(user_start|user_end|assistant_start|assistant_end|system|bos|eos|python_start|python_end|output_start|output_end|calculator_start|calculator_end)\|>/g;
 
-        // Re-render message texts when user toggles the checkbox
+        function updateTokenUI(total, inUsed = 0, outUsed = 0) {
+            tokTotal.innerText = total;
+            tokIn.innerText = inUsed;
+            tokOut.innerText = outUsed;
+        }
+
+        async function syncTokenUsage() {
+            try {
+                const res = await fetch(`${BASE_API}/api/token_usage?session_id=${sessionId}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    updateTokenUI(data.used_tokens, data.input_used, data.output_used);
+                }
+            } catch (e) { /* ignore offline */ }
+        }
+
+        // Info Modal Handler
+        infoBtn.addEventListener('click', async () => {
+            infoModal.style.display = 'flex';
+            try {
+                const res = await fetch(`${BASE_API}/api/info?session_id=${sessionId}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    document.getElementById('m-name').innerText = data.model.name;
+                    document.getElementById('m-params').innerText = (data.model.parameters / 1e6).toFixed(1) + "M";
+                    document.getElementById('m-layers').innerText = data.model.layers;
+                    document.getElementById('m-dim').innerText = data.model.dim;
+                    document.getElementById('m-heads').innerText = data.model.heads;
+                    document.getElementById('m-context').innerText = data.limits.max_context_tokens + " tokens";
+                    document.getElementById('m-in-budget').innerText = data.limits.input_budget + " tokens";
+                    document.getElementById('m-out-budget').innerText = data.limits.reserved_for_generation + " tokens";
+                    document.getElementById('m-gpu').innerText = data.model.gpu;
+                }
+            } catch (e) {
+                console.error("Failed to load model info:", e);
+            }
+        });
+
+        modalCloseBtn.addEventListener('click', () => infoModal.style.display = 'none');
+        window.addEventListener('click', (e) => {
+            if (e.target === infoModal) infoModal.style.display = 'none';
+        });
+
+        // Reset Conversation
+        resetBtn.addEventListener('click', async () => {
+            try {
+                await fetch(`${BASE_API}/api/reset`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: sessionId })
+                });
+            } catch (err) {
+                console.error("Failed to reset backend:", err);
+            }
+            historyContainer.innerHTML = `
+                <div class="message assistant">
+                    <div class="role-label">System</div>
+                    <div class="message-body">Context buffer cleared. New session started.</div>
+                </div>
+            `;
+            updateTokenUI(1, 0, 0);
+        });
+
         toggleTokensCheckbox.addEventListener('change', () => {
             const messages = historyContainer.querySelectorAll('.message-body');
             messages.forEach(body => {
@@ -280,19 +460,15 @@
         });
 
         function formatText(text) {
-            if (toggleTokensCheckbox.checked) {
-                return text; // Show raw text including special tokens
-            }
+            if (toggleTokensCheckbox.checked) return text;
             return text.replace(SPECIAL_TOKENS_REGEX, '').trim();
         }
 
-        // Auto-expand textarea
         promptInput.addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = (this.scrollHeight) + 'px';
         });
 
-        // Enter key submits (Shift+Enter adds new line)
         promptInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -306,34 +482,27 @@
             const prompt = promptInput.value.trim();
             if (!prompt) return;
 
-            // 1. Append User Message
             appendMessage('user', 'You', prompt);
             promptInput.value = '';
             promptInput.style.height = 'auto';
             setLoading(true);
 
-            // 2. Append Assistant Message Placeholder
             const assistantMsgDiv = appendMessage('assistant', 'Otium AI', '');
             const contentDiv = assistantMsgDiv.querySelector('.message-body');
-            
             let rawAccumulatedText = "";
 
-            // Add cursor
             const cursor = document.createElement('span');
             cursor.className = 'cursor-blink';
             contentDiv.appendChild(cursor);
 
             try {
-                // 3. Initiate SSE Streaming Request to Python Backend
-                const response = await fetch(BACKEND_URL, {
+                const response = await fetch(`${BASE_API}/api/chat`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: prompt })
+                    body: JSON.stringify({ prompt: prompt, session_id: sessionId })
                 });
 
-                if (!response.ok) {
-                    throw new Error(`Server error: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`Server error: ${response.status}`);
 
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
@@ -345,27 +514,23 @@
                     const chunk = decoder.decode(value, { stream: true });
                     rawAccumulatedText += chunk;
 
-                    // Save raw unformatted text to data attribute
                     contentDiv.dataset.rawText = rawAccumulatedText;
-
-                    // Remove cursor, format text according to checkbox state, re-add cursor
                     cursor.remove();
                     contentDiv.innerText = formatText(rawAccumulatedText);
                     contentDiv.appendChild(cursor);
-                    
                     scrollToBottom();
                 }
 
             } catch (err) {
                 cursor.remove();
-                rawAccumulatedText += `\n[Error: Could not establish secure connection to GPU inference server.]`;
+                rawAccumulatedText += `\n[Error: Could not connect to inference engine.]`;
                 contentDiv.dataset.rawText = rawAccumulatedText;
                 contentDiv.innerText = formatText(rawAccumulatedText);
-                console.error(err);
             } finally {
                 cursor.remove();
                 setLoading(false);
                 scrollToBottom();
+                syncTokenUsage();
             }
         }
 
@@ -398,6 +563,8 @@
             sendBtn.disabled = isLoading;
             promptInput.disabled = isLoading;
         }
+
+        syncTokenUsage();
     </script>
 </body>
 </html>
