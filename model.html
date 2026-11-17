@@ -466,7 +466,7 @@
     <div class="about-section">
         <h1 data-i18n="aboutTitle">Otium Code LLM — Network Primitives &amp; Architecture</h1>
         <p data-i18n="aboutP1">
-            Otium Code LLM is a bilingual (Danish and English) autoregressive Transformer engineered for 32K long-context reasoning, lossless continuous FIFO token streaming, C++20 grammar-constrained decoding, live AST calculator execution, and rejection-sampled reinforcement learning.
+            Otium Code LLM is a 24-layer bilingual (Danish and English) autoregressive Transformer engineered for two-stage 8K &rarr; 32K long-context reasoning, lossless continuous FIFO token streaming, C++20 grammar-constrained decoding, live AST calculator execution, and rejection-sampled reinforcement learning.
         </p>
         <p data-i18n="aboutP2">
             The interactive schematic below illustrates every primitive in the network from <strong>Input Gather</strong> to <strong>Output Logits</strong>. Click any block in the diagram or any card on the right to isolate and inspect that primitive.
@@ -485,9 +485,9 @@
             <div class="svg-board-wrapper">
                 <div class="svg-legend">
                     <span class="legend-chip"><span class="legend-dot" style="background:#64B5F6;"></span><span data-i18n="legGather">Input Gather</span></span>
-                    <span class="legend-chip"><span class="legend-dot" style="background:#4CAF50;"></span><span data-i18n="legSwa">15 Sliding (S)</span></span>
-                    <span class="legend-chip"><span class="legend-dot" style="background:#FFB74D;"></span><span data-i18n="legFull">5 Full (L)</span></span>
-                    <span class="legend-chip"><span class="legend-dot" style="background:#CE93D8;"></span><span data-i18n="legRes">x₀ / VE / Backout</span></span>
+                    <span class="legend-chip"><span class="legend-dot" style="background:#4CAF50;"></span><span data-i18n="legSwa">18 Sliding (S)</span></span>
+                    <span class="legend-chip"><span class="legend-dot" style="background:#FFB74D;"></span><span data-i18n="legFull">6 Full (L)</span></span>
+                    <span class="legend-chip"><span class="legend-dot" style="background:#CE93D8;"></span><span data-i18n="legRes">Mid Backout</span></span>
                     <span class="legend-chip"><span class="legend-dot" style="background:#EF9A9A;"></span><span data-i18n="legPda">C++20 PDA Mask</span></span>
                 </div>
 
@@ -520,16 +520,16 @@
                         <!-- Continuous FIFO Token Stream Box -->
                         <rect x="24" y="37" width="174" height="75" rx="4" fill="#141414" stroke="#333"/>
                         <text x="32" y="51" fill="#fff" font-family="monospace" font-size="8.8" font-weight="bold">Continuous FIFO Stream</text>
-                        <text x="32" y="63" fill="#999" font-family="monospace" font-size="7.6">overlap K=0/64 · intra-doc mask</text>
+                        <text x="32" y="63" fill="#999" font-family="monospace" font-size="7.6">8K (K=0) → 32K (K=64) · varlen</text>
 
                         <!-- Token cells: <|bos|>, t-2, t-1, t -->
                         <rect x="31" y="71" width="38" height="30" rx="3" fill="#1c1c1c" stroke="#444"/>
                         <text x="50" y="84" text-anchor="middle" fill="#888" font-family="monospace" font-size="7.2">&lt;|bos|&gt;</text>
-                        <text x="50" y="95" text-anchor="middle" fill="#666" font-family="monospace" font-size="6.8">t-2</text>
+                        <text x="50" y="95" text-anchor="middle" fill="#666" font-family="monospace" font-size="6.8">t−2</text>
 
                         <rect x="73" y="71" width="54" height="30" rx="3" fill="#211a26" stroke="#CE93D8" stroke-width="1.1"/>
                         <text x="100" y="84" text-anchor="middle" fill="#CE93D8" font-family="monospace" font-size="7.8" font-weight="bold">id=4812</text>
-                        <text x="100" y="95" text-anchor="middle" fill="#bbb" font-family="monospace" font-size="7">t-1 (prev)</text>
+                        <text x="100" y="95" text-anchor="middle" fill="#bbb" font-family="monospace" font-size="7">t−1 (prev)</text>
 
                         <rect x="131" y="71" width="58" height="30" rx="3" fill="#162618" stroke="#4CAF50" stroke-width="1.4"/>
                         <text x="160" y="84" text-anchor="middle" fill="#4CAF50" font-family="monospace" font-size="8" font-weight="bold">id=334</text>
@@ -539,20 +539,20 @@
                         <line x1="198" y1="76" x2="222" y2="76" stroke="#64B5F6" stroke-width="1.6" marker-end="url(#arr-blue)"/>
                         <text x="210" y="69" text-anchor="middle" fill="#64B5F6" font-family="monospace" font-size="7.5">gather</text>
 
-                        <!-- Untied Token Embedding Table (wte: 32,768 x 1,280) -->
+                        <!-- Untied Token Embedding Table (wte: 32,768 x 1,536) -->
                         <rect x="226" y="37" width="210" height="75" rx="4" fill="#141414" stroke="#4CAF50" stroke-width="1.3"/>
-                        <text x="235" y="51" fill="#fff" font-family="monospace" font-size="8.8" font-weight="bold">Untied wte (32,768 × 1,280)</text>
+                        <text x="235" y="51" fill="#fff" font-family="monospace" font-size="8.8" font-weight="bold">Untied wte (32,768 × 1,536)</text>
                         <rect x="235" y="56" width="192" height="11" rx="2" fill="#1b1b1b" stroke="#333"/>
                         <rect x="235" y="70" width="192" height="13" rx="2" fill="#172819" stroke="#4CAF50" stroke-width="1.1"/>
-                        <text x="240" y="79" fill="#4CAF50" font-family="monospace" font-size="7.6" font-weight="bold">row e_{t-1} = wte[4812]</text>
+                        <text x="240" y="79" fill="#4CAF50" font-family="monospace" font-size="7.6" font-weight="bold">row e(t−1) = wte[4812]</text>
                         <rect x="235" y="86" width="192" height="14" rx="2" fill="#172819" stroke="#4CAF50" stroke-width="1.4"/>
-                        <text x="240" y="96" fill="#4CAF50" font-family="monospace" font-size="7.8" font-weight="bold">row e_t     = wte[334]</text>
+                        <text x="240" y="96" fill="#4CAF50" font-family="monospace" font-size="7.8" font-weight="bold">row e(t)   = wte[334]</text>
 
                         <!-- Smear Gate + Initial RMSNorm producing x_0 -->
                         <line x1="436" y1="76" x2="456" y2="76" stroke="#4CAF50" stroke-width="1.6" marker-end="url(#arr-green)"/>
                         <rect x="460" y="37" width="116" height="75" rx="4" fill="#141414" stroke="#CE93D8" stroke-width="1.2"/>
                         <text x="468" y="51" fill="#CE93D8" font-family="monospace" font-size="8.5" font-weight="bold">smear_gate</text>
-                        <text x="468" y="64" fill="#ccc" font-family="monospace" font-size="7.5">e_t + λ_s·g·e_{t-1}</text>
+                        <text x="468" y="64" fill="#ccc" font-family="monospace" font-size="7.5">e(t) + λ_s·g·e(t−1)</text>
                         <text x="468" y="75" fill="#888" font-family="monospace" font-size="7">(masked at &lt;|bos|&gt;)</text>
                         <rect x="468" y="82" width="100" height="22" rx="3" fill="#172819" stroke="#4CAF50" stroke-width="1.2"/>
                         <text x="518" y="96" text-anchor="middle" fill="#4CAF50" font-family="monospace" font-size="8.4" font-weight="bold">x₀ = RMSNorm</text>
@@ -562,52 +562,34 @@
                     <line x1="300" y1="124" x2="300" y2="144" stroke="#4CAF50" stroke-width="1.8" marker-end="url(#arr-green)"/>
 
                     <!-- ========================================================
-                         PRIMITIVE 2: 20-LAYER 'SSSL' TRANSFORMER SPINE (CENTER)
+                         PRIMITIVE 2: 24-LAYER 'SSSL' TRANSFORMER SPINE (CENTER)
                          ======================================================== -->
                     <g id="svg-prim-2" class="svg-prim highlighted" onclick="selectPrimitive(2)">
-                        <rect x="196" y="146" width="208" height="442" rx="6" fill="#161616" stroke="#383838" stroke-width="1.3"/>
-                        <text x="300" y="163" text-anchor="middle" fill="#fff" font-family="monospace" font-size="9.5" font-weight="bold">02. 20-LAYER 'SSSL' SPINE</text>
-                        <!-- 20 Layers (L00..L19) statically populated by JS -->
+                        <rect x="196" y="146" width="208" height="444" rx="6" fill="#161616" stroke="#383838" stroke-width="1.3"/>
+                        <text x="300" y="162" text-anchor="middle" fill="#fff" font-family="monospace" font-size="9.5" font-weight="bold">02. 24-LAYER 'SSSL' SPINE (6×4)</text>
+                        <!-- 24 Layers (L00..L23) statically populated by JS -->
                         <g id="svg-spine-layers"></g>
                     </g>
 
                     <!-- ========================================================
-                         PRIMITIVE 3: RESIDUAL HIGHWAYS & VALUE EMBEDDINGS (LEFT)
+                         PRIMITIVE 3: MID-NETWORK BACKOUT ONLY (LEFT OF SPINE)
                          ======================================================== -->
                     <g id="svg-prim-3" class="svg-prim highlighted" onclick="selectPrimitive(3)">
-                        <!-- x0_lambdas Vertical Bus -->
-                        <path d="M 176 124 L 176 566" fill="none" stroke="#CE93D8" stroke-width="2"/>
-                        <line x1="176" y1="196" x2="196" y2="196" stroke="#CE93D8" stroke-width="1.3" marker-end="url(#arr-purple)"/>
-                        <line x1="176" y1="276" x2="196" y2="276" stroke="#CE93D8" stroke-width="1.3" marker-end="url(#arr-purple)"/>
-                        <line x1="176" y1="356" x2="196" y2="356" stroke="#CE93D8" stroke-width="1.3" marker-end="url(#arr-purple)"/>
-                        <line x1="176" y1="436" x2="196" y2="436" stroke="#CE93D8" stroke-width="1.3" marker-end="url(#arr-purple)"/>
-                        <line x1="176" y1="516" x2="196" y2="516" stroke="#CE93D8" stroke-width="1.3" marker-end="url(#arr-purple)"/>
+                        <!-- Tap out from Midpoint Layer 11 (y=364) to Left Backout Bus and down to Pre-Final Norm (y=602) -->
+                        <circle cx="196" cy="364" r="3.5" fill="#CE93D8"/>
+                        <path d="M 196 364 L 168 364 L 168 602 L 292 602" fill="none" stroke="#CE93D8" stroke-width="1.8" marker-end="url(#arr-purple)"/>
 
-                        <!-- x0 Highway Box -->
-                        <rect x="12" y="152" width="152" height="114" rx="5" fill="#1d1622" stroke="#CE93D8" stroke-width="1.2"/>
-                        <text x="20" y="170" fill="#CE93D8" font-family="monospace" font-size="9.2" font-weight="bold">03. x₀ HIGHWAY</text>
-                        <text x="20" y="186" fill="#fff" font-family="monospace" font-size="8">resid_λ·x + x0_λ·x₀</text>
-                        <text x="20" y="202" fill="#aaa" font-family="monospace" font-size="7.6">Every layer mixes</text>
-                        <text x="20" y="214" fill="#aaa" font-family="monospace" font-size="7.6">gathered x₀ directly</text>
-                        <text x="20" y="226" fill="#aaa" font-family="monospace" font-size="7.6">into residual stream.</text>
-
-                        <!-- Alternating Value Embeddings (VE) Box -->
-                        <rect x="12" y="280" width="152" height="118" rx="5" fill="#1d1622" stroke="#CE93D8" stroke-width="1.2"/>
-                        <text x="20" y="298" fill="#CE93D8" font-family="monospace" font-size="9.2" font-weight="bold">VALUE EMBEDS (VE)</text>
-                        <text x="20" y="314" fill="#fff" font-family="monospace" font-size="8">ve_gate = 2·σ(W_g·x)</text>
-                        <text x="20" y="328" fill="#66BB6A" font-family="monospace" font-size="7.8">v ← v + ve_gate·VE[t]</text>
-                        <text x="20" y="344" fill="#aaa" font-family="monospace" font-size="7.6">Odd layers gather</text>
-                        <text x="20" y="356" fill="#aaa" font-family="monospace" font-size="7.6">token rows directly</text>
-                        <text x="20" y="368" fill="#aaa" font-family="monospace" font-size="7.6">into attention V.</text>
-
-                        <!-- Mid-Network Backout at Layer 10 -->
-                        <path d="M 196 372 L 168 372 L 168 600 L 292 600" fill="none" stroke="#EF9A9A" stroke-width="1.6" marker-end="url(#arr-red)"/>
-                        <rect x="12" y="412" width="148" height="106" rx="5" fill="#241616" stroke="#EF9A9A" stroke-width="1.2"/>
-                        <text x="20" y="430" fill="#EF9A9A" font-family="monospace" font-size="9.2" font-weight="bold">LAYER 10 BACKOUT</text>
-                        <text x="20" y="446" fill="#fff" font-family="monospace" font-size="8">x ← x − λ_back·x_mid</text>
-                        <text x="20" y="462" fill="#aaa" font-family="monospace" font-size="7.6">Caches residual at</text>
-                        <text x="20" y="474" fill="#aaa" font-family="monospace" font-size="7.6">L10 and subtracts it</text>
-                        <text x="20" y="486" fill="#aaa" font-family="monospace" font-size="7.6">before final RMSNorm.</text>
+                        <!-- Mid-Network Backout Box (Centered on Left) -->
+                        <rect x="12" y="290" width="148" height="150" rx="5" fill="#1d1622" stroke="#CE93D8" stroke-width="1.3"/>
+                        <text x="20" y="310" fill="#CE93D8" font-family="monospace" font-size="9.2" font-weight="bold">03. MID-NET BACKOUT</text>
+                        <text x="20" y="326" fill="#fff" font-family="monospace" font-size="8.2">Midpoint: Layer 11</text>
+                        <rect x="20" y="335" width="132" height="20" rx="3" fill="#141018" stroke="#CE93D8" stroke-width="0.9"/>
+                        <text x="86" y="348" text-anchor="middle" fill="#CE93D8" font-family="monospace" font-size="7.8" font-weight="bold">x_mid = x_11</text>
+                        <text x="20" y="370" fill="#aaa" font-family="monospace" font-size="7.6">Caches the residual</text>
+                        <text x="20" y="382" fill="#aaa" font-family="monospace" font-size="7.6">stream halfway down</text>
+                        <text x="20" y="394" fill="#aaa" font-family="monospace" font-size="7.6">the 24-layer stack</text>
+                        <text x="20" y="406" fill="#aaa" font-family="monospace" font-size="7.6">and subtracts:</text>
+                        <text x="20" y="423" fill="#fff" font-family="monospace" font-size="7.8" font-weight="bold">x ← x − λ_back·x_mid</text>
                     </g>
 
                     <!-- ========================================================
@@ -619,8 +601,8 @@
 
                         <rect x="428" y="152" width="160" height="206" rx="5" fill="#152016" stroke="#4CAF50" stroke-width="1.3"/>
                         <text x="438" y="170" fill="#4CAF50" font-family="monospace" font-size="9.2" font-weight="bold">04. RING KV CACHE</text>
-                        <text x="438" y="185" fill="#fff" font-family="monospace" font-size="8">15 Sliding ('S') Layers</text>
-                        <text x="438" y="198" fill="#aaa" font-family="monospace" font-size="7.5">Bounded cap = W + 1</text>
+                        <text x="438" y="185" fill="#fff" font-family="monospace" font-size="8">18 Sliding ('S') Layers</text>
+                        <text x="438" y="198" fill="#aaa" font-family="monospace" font-size="7.5">W = 2,048 (cap = 2,049)</text>
 
                         <!-- Static Circular Ring Buffer Graphic -->
                         <circle cx="508" cy="238" r="26" fill="none" stroke="#263828" stroke-width="6"/>
@@ -630,10 +612,10 @@
                         <text x="508" y="278" text-anchor="middle" fill="#66BB6A" font-family="monospace" font-size="7.8">slot = pos % (W + 1)</text>
 
                         <line x1="438" y1="288" x2="578" y2="288" stroke="#283829"/>
-                        <text x="438" y="303" fill="#FFB74D" font-family="monospace" font-size="8.2" font-weight="bold">5 Full ('L') Layers</text>
-                        <text x="438" y="316" fill="#aaa" font-family="monospace" font-size="7.5">L03, L07, L11, L15, L19</text>
+                        <text x="438" y="303" fill="#FFB74D" font-family="monospace" font-size="8.2" font-weight="bold">6 Full ('L') Layers</text>
+                        <text x="438" y="316" fill="#aaa" font-family="monospace" font-size="7.3">L03, L07, L11, L15, L19, L23</text>
                         <text x="438" y="328" fill="#aaa" font-family="monospace" font-size="7.5">QK-RMSNorm (1.2× scale)</text>
-                        <text x="438" y="340" fill="#aaa" font-family="monospace" font-size="7.5">RoPE θ = 100k → 500k</text>
+                        <text x="438" y="340" fill="#aaa" font-family="monospace" font-size="7.5">RoPE θ: 100k(8K)→500k(32K)</text>
                     </g>
 
                     <!-- ========================================================
@@ -668,13 +650,13 @@
 
                         <line x1="438" y1="504" x2="578" y2="504" stroke="#2c2c2c"/>
                         <text x="438" y="519" fill="#fff" font-family="monospace" font-size="8.2" font-weight="bold">On-Policy GRPO &amp; Muon</text>
-                        <text x="438" y="532" fill="#aaa" font-family="monospace" font-size="7.5">• A_i = r_i - mean(r)</text>
+                        <text x="438" y="532" fill="#aaa" font-family="monospace" font-size="7.5">• A_i = r_i − mean(r)</text>
                         <text x="438" y="544" fill="#aaa" font-family="monospace" font-size="7.5">• DAPO loss on mask == 1</text>
                         <text x="438" y="556" fill="#4CAF50" font-family="monospace" font-size="7.5">• 5-step Polar Express</text>
                     </g>
 
                     <!-- Spine Exit Arrow -->
-                    <line x1="300" y1="588" x2="300" y2="614" stroke="#4CAF50" stroke-width="1.8" marker-end="url(#arr-green)"/>
+                    <line x1="300" y1="590" x2="300" y2="614" stroke="#4CAF50" stroke-width="1.8" marker-end="url(#arr-green)"/>
 
                     <!-- ========================================================
                          PRIMITIVE 6: OUTPUT LOGITS & TANH SOFTCAP
@@ -687,7 +669,7 @@
                         <rect x="24" y="644" width="152" height="72" rx="4" fill="#141414" stroke="#333"/>
                         <text x="32" y="661" fill="#fff" font-family="monospace" font-size="8.8" font-weight="bold">1. Final RMSNorm</text>
                         <text x="32" y="676" fill="#ccc" font-family="monospace" font-size="7.8">h = RMSNorm(x − Backout)</text>
-                        <text x="32" y="691" fill="#888" font-family="monospace" font-size="7.4">Shape: (B, T, 1280)</text>
+                        <text x="32" y="691" fill="#888" font-family="monospace" font-size="7.4">Shape: (B, T, 1536)</text>
                         <text x="32" y="704" fill="#888" font-family="monospace" font-size="7.4">Zero-parameter scale</text>
 
                         <line x1="176" y1="680" x2="198" y2="680" stroke="#4CAF50" stroke-width="1.6" marker-end="url(#arr-green)"/>
@@ -695,7 +677,7 @@
                         <!-- Untied lm_head -->
                         <rect x="202" y="644" width="186" height="72" rx="4" fill="#141414" stroke="#4CAF50" stroke-width="1.2"/>
                         <text x="212" y="661" fill="#fff" font-family="monospace" font-size="8.8" font-weight="bold">2. Untied lm_head</text>
-                        <text x="212" y="676" fill="#4CAF50" font-family="monospace" font-size="8">z_raw = h · W_lm (1280→32,768)</text>
+                        <text x="212" y="676" fill="#4CAF50" font-family="monospace" font-size="8">z_raw = h · W_lm (1536→32,768)</text>
                         <text x="212" y="691" fill="#aaa" font-family="monospace" font-size="7.5">Untied from input wte table</text>
                         <text x="212" y="704" fill="#888" font-family="monospace" font-size="7.4">Chunked CE (2048 token strips)</text>
 
@@ -705,7 +687,7 @@
                         <rect x="414" y="644" width="162" height="72" rx="4" fill="#141414" stroke="#FFB74D" stroke-width="1.2"/>
                         <text x="424" y="661" fill="#FFB74D" font-family="monospace" font-size="8.8" font-weight="bold">3. Logit Softcapping</text>
                         <text x="424" y="677" fill="#fff" font-family="monospace" font-size="8.2">z = 15.0·tanh(z_raw / 15.0)</text>
-                        <text x="424" y="692" fill="#aaa" font-family="monospace" font-size="7.5">Bounds logits to (-15, +15)</text>
+                        <text x="424" y="692" fill="#aaa" font-family="monospace" font-size="7.5">Bounds logits to (−15, +15)</text>
                         <text x="424" y="704" fill="#888" font-family="monospace" font-size="7.4">Evaluated in Bits-Per-Byte</text>
                     </g>
 
@@ -725,7 +707,7 @@
                         <text x="32" y="814" fill="#ccc" font-family="monospace" font-size="7.6">Modes: TOOL_JSON | JSON</text>
                         <text x="32" y="826" fill="#ccc" font-family="monospace" font-size="7.6">PYTHON (indent) | CPP | TEXT</text>
                         <rect x="32" y="834" width="170" height="19" rx="3" fill="#291616" stroke="#EF9A9A"/>
-                        <text x="117" y="847" text-anchor="middle" fill="#EF9A9A" font-family="monospace" font-size="7.8" font-weight="bold">z[illegal] = -∞ (&lt;0.5 ms)</text>
+                        <text x="117" y="847" text-anchor="middle" fill="#EF9A9A" font-family="monospace" font-size="7.8" font-weight="bold">z[illegal] = −∞ (&lt;0.5 ms)</text>
                         <text x="32" y="867" fill="#66BB6A" font-family="monospace" font-size="7.4">&lt;|tool_end|&gt; → AST Calculator</text>
 
                         <line x1="210" y1="830" x2="232" y2="830" stroke="#4CAF50" stroke-width="1.6" marker-end="url(#arr-green)"/>
@@ -748,71 +730,71 @@
                         <text x="246" y="849" fill="#EF9A9A" font-family="monospace" font-size="8" text-decoration="line-through">"**"</text>
                         <rect x="292" y="840" width="64" height="10" rx="2" fill="#2a1616" stroke="#EF9A9A" stroke-dasharray="2 2"/>
                         <line x1="290" y1="840" x2="358" y2="850" stroke="#EF9A9A" stroke-width="1.2"/>
-                        <text x="364" y="849" fill="#EF9A9A" font-family="monospace" font-size="7.6" font-weight="bold">-∞ (PDA Masked: double op)</text>
+                        <text x="364" y="849" fill="#EF9A9A" font-family="monospace" font-size="7.6" font-weight="bold">−∞ (PDA Masked: double op)</text>
 
                         <!-- Token Bar 4 (Rejected by PDA: unclosed paren) -->
                         <text x="246" y="865" fill="#EF9A9A" font-family="monospace" font-size="8" text-decoration="line-through">'"}\''</text>
                         <rect x="292" y="856" width="52" height="10" rx="2" fill="#2a1616" stroke="#EF9A9A" stroke-dasharray="2 2"/>
                         <line x1="290" y1="856" x2="346" y2="866" stroke="#EF9A9A" stroke-width="1.2"/>
-                        <text x="352" y="865" fill="#EF9A9A" font-family="monospace" font-size="7.6" font-weight="bold">-∞ (PDA Masked: paren depth≠0)</text>
+                        <text x="352" y="865" fill="#EF9A9A" font-family="monospace" font-size="7.6" font-weight="bold">−∞ (PDA Masked: paren depth≠0)</text>
                     </g>
                 </svg>
             </div>
 
-            <!-- RIGHT: 8 Clickable Primitive Cards (All + 01..07) -->
+            <!-- RIGHT: 8 Clickable Primitive Cards (All + 01..07, Zero Raw LaTeX) -->
             <div class="prim-cards-col">
                 <div class="prim-card active" data-prim="0" onclick="selectPrimitive(0)">
                     <div class="prim-card-meta">
                         <span class="step-tag" data-i18n="c0Tag">ALL PRIMITIVES</span>
-                        <span>32K Context · V=32,768</span>
+                        <span>8K → 32K Context · d24 r8</span>
                     </div>
                     <h3 data-i18n="c0Title">Complete Network Overview</h3>
                     <p data-i18n="c0Desc">
-                        Shows the full forward and decoding path from continuous token ingestion and input embedding gather through the 20-layer hybrid stack to grammar-constrained output logits.
+                        Shows the complete forward and decoding path from continuous FIFO token ingestion and input embedding gather through the 24-layer SSSL stack to grammar-constrained output logits.
                     </p>
                 </div>
 
                 <div class="prim-card" data-prim="1" onclick="selectPrimitive(1)">
                     <div class="prim-card-meta">
                         <span class="step-tag">01 · INPUT GATHER</span>
-                        <span>wte (32,768 × 1,280)</span>
+                        <span>wte (32,768 × 1,536)</span>
                     </div>
                     <h3 data-i18n="c1Title">Continuous FIFO Stream &amp; wte Gather</h3>
                     <p data-i18n="c1Desc">
-                        Tokens enter from a lossless FIFO stream (<span class="chip chip-gather">overlap K=0/64</span>, intra-doc boundary mask). Token IDs gather vector rows $e_{t-1}, e_t$ from the untied <code style="font-family:monospace">wte</code> matrix, mix bigram context via <code style="font-family:monospace">smear_gate</code>, and normalize to $x_0$.
+                        Tokens enter from a lossless FIFO stream (<span class="chip chip-gather">overlap K=0 → 64</span>, intra-doc boundary mask). Token IDs gather vector rows e<sub>t−1</sub> and e<sub>t</sub> from the untied <code style="font-family:monospace">wte</code> matrix, blend bigram context via <code style="font-family:monospace">smear_gate</code>, and normalize to x<sub>0</sub>.
                     </p>
                 </div>
 
                 <div class="prim-card" data-prim="2" onclick="selectPrimitive(2)">
                     <div class="prim-card-meta">
-                        <span class="step-tag">02 · 20-LAYER SSSL SCHEDULE</span>
-                        <span>15 Sliding · 5 Full</span>
+                        <span class="step-tag">02 · 24-LAYER SSSL SCHEDULE</span>
+                        <span>18 Sliding · 6 Full</span>
                     </div>
-                    <h3 data-i18n="c2Title">20-Layer Hybrid SSSL Attention Spine</h3>
+                    <h3 data-i18n="c2Title">24-Layer Hybrid SSSL Attention Spine</h3>
                     <p data-i18n="c2Desc">
-                        Five blocks of four layers: 15 <span class="chip chip-swa">Sliding Window (S)</span> layers capture local positional order, while 5 <span class="chip chip-full">Full Global (L)</span> layers (<code style="font-family:monospace">L03, L07, L11, L15, L19</code>) attend across the entire 32K sequence.
+                        Six blocks of four layers: 18 <span class="chip chip-swa">Sliding Window (S)</span> layers (W = 2,048) capture local positional order, while 6 <span class="chip chip-full">Full Global (L)</span> layers (<code style="font-family:monospace">L03, L07, L11, L15, L19, L23</code>) attend across the full 32K sequence.
                     </p>
                 </div>
 
                 <div class="prim-card" data-prim="3" onclick="selectPrimitive(3)">
                     <div class="prim-card-meta">
-                        <span class="step-tag">03 · RESIDUAL HIGHWAYS &amp; VE</span>
-                        <span>x₀ · VE · Backout</span>
+                        <span class="step-tag">03 · MID-NETWORK BACKOUT</span>
+                        <span>Layer 11 → Final Norm</span>
                     </div>
-                    <h3 data-i18n="c3Title">x₀ Highway, Value Embeddings &amp; Backout</h3>
+                    <h3 data-i18n="c3Title">Mid-Network Residual Backout</h3>
                     <p data-i18n="c3Desc">
-                        Each layer mixes initial $x_0$ via <span class="chip chip-res">resid_lambdas</span> and <span class="chip chip-res">x0_lambdas</span>. Odd layers inject gated token <span class="chip chip-res">Value Embeddings (VE)</span> into attention $V$, and Layer 10's residual is subtracted via <code style="font-family:monospace">backout_lambda</code>.
+                        At the midpoint of the 24-layer stack (<code style="font-family:monospace">L11</code>), the residual stream x<sub>mid</sub> is cached. Before the final RMSNorm, <span class="chip chip-res">λ<sub>backout</sub> · x<sub>mid</sub></span> is subtracted from the final hidden state so early surface features do not crowd the output logits.
                     </p>
                 </div>
 
                 <div class="prim-card" data-prim="4" onclick="selectPrimitive(4)">
                     <div class="prim-card-meta">
                         <span class="step-tag">04 · CIRCULAR RING KV CACHE</span>
-                        <span>slot = pos % (W + 1)</span>
+                        <span>slot = pos % 2,049</span>
                     </div>
                     <h3 data-i18n="c4Title">Bounded Ring-Buffer KV &amp; 32K RoPE</h3>
                     <p data-i18n="c4Desc">
-                        During decoding, the 15 <span class="chip chip-swa">S</span> layers wrap writes inside a fixed $(W + 1)$ circular ring buffer rather than growing linearly, paired with $1.2\times$ QK-RMSNorm and $\theta = 100\text{k} \rightarrow 500\text{k}$ RoPE.
+                        During decoding, the 18 <span class="chip chip-swa">S</span> layers wrap writes inside a fixed (W + 1 = 2,049) circular ring buffer rather than growing linearly, paired with 1.2× QK-RMSNorm and RoPE θ = 100,000 (8K) &rarr; 500,000 (32K).
                     </p>
                 </div>
 
@@ -823,18 +805,18 @@
                     </div>
                     <h3 data-i18n="c5Title">ReLU² Sparsity, Rejection Sampling &amp; RL</h3>
                     <p data-i18n="c5Desc">
-                        MLPs apply squared <span class="chip chip-swa">ReLU(x)²</span> for natural activation sparsity. Post-training runs $K=4$ Rejection Sampling with live calculator execution and on-policy GRPO RL ($A_i = r_i - \mu_r$).
+                        MLPs apply squared <span class="chip chip-swa">ReLU(x)<sup>2</sup></span> for natural activation sparsity. Post-training runs K=4 Rejection Sampling with live calculator execution and on-policy GRPO RL (A<sub>i</sub> = r<sub>i</sub> &minus; r&#772;).
                     </p>
                 </div>
 
                 <div class="prim-card" data-prim="6" onclick="selectPrimitive(6)">
                     <div class="prim-card-meta">
                         <span class="step-tag">06 · OUTPUT LOGITS &amp; SOFTCAP</span>
-                        <span>1,280 → 32,768</span>
+                        <span>1,536 → 32,768</span>
                     </div>
                     <h3 data-i18n="c6Title">Untied lm_head &amp; Tanh Logit Softcap</h3>
                     <p data-i18n="c6Desc">
-                        Final normalized hidden states project through the untied <code style="font-family:monospace">lm_head</code> to 32,768 vocabulary logits and are smoothly bounded by $15.0\cdot\tanh(z/15.0)$ with chunked cross-entropy training.
+                        Final normalized hidden states project through the untied <code style="font-family:monospace">lm_head</code> to 32,768 vocabulary logits and are smoothly bounded by 15.0 &middot; tanh(z / 15.0) with chunked cross-entropy training.
                     </p>
                 </div>
 
@@ -845,7 +827,7 @@
                     </div>
                     <h3 data-i18n="c7Title">C++20 Pushdown Automaton &amp; AST Tool</h3>
                     <p data-i18n="c7Desc">
-                        A native C++20 byte automaton validates all 32,768 next tokens per step across 5 grammar modes, setting illegal logits to <span class="chip chip-pda">-∞</span> and intercepting <code style="font-family:monospace">&lt;|tool_end|&gt;</code> for sandboxed AST math evaluation.
+                        A native C++20 byte automaton validates all 32,768 next tokens per step across 5 grammar modes, setting illegal logits to <span class="chip chip-pda">&minus;&infin;</span> and intercepting <code style="font-family:monospace">&lt;|tool_end|&gt;</code> for sandboxed AST math evaluation.
                     </p>
                 </div>
             </div>
@@ -858,18 +840,18 @@
                 <div class="formula-bar-sub" id="formula-sub">Click any primitive block in the diagram or card list to inspect its exact equation.</div>
             </div>
             <div class="formula-box" id="formula-code">
-                idx (B,T) → wte[idx] → 20× SSSL Layers → lm_head → 15·tanh(z/15) → C++20 PDA Mask
+                idx (B,T) → wte[idx] → 24× SSSL Layers → lm_head → 15·tanh(z/15) → C++20 PDA Mask
             </div>
         </div>
     </div>
 
-    <!-- Model & Inference Information Section (Matches chat.html specification table) -->
+    <!-- Model & Inference Information Section (Matches run_nanochat2_pipeline.sh d24 r8) -->
     <div class="info-card-section" id="model-info-section">
         <h2 data-i18n="infoSectionTitle">Model &amp; Inference Information</h2>
         <table class="info-table">
             <tr>
                 <td data-i18n="lblModelName">Model Name</td>
-                <td id="page-m-name">Otium Code LLM (Bilingual DA/EN)</td>
+                <td id="page-m-name">Otium Code LLM (d24 r8 · Bilingual DA/EN)</td>
             </tr>
             <tr>
                 <td data-i18n="lblBaseArch">Base Architecture</td>
@@ -877,23 +859,27 @@
             </tr>
             <tr>
                 <td data-i18n="lblParams">Parameter Count</td>
-                <td id="page-m-params">~560M (Depth 20 · Untied wte/lm_head + VE)</td>
+                <td id="page-m-params">~957M (906M Scaling + Untied wte/lm_head)</td>
             </tr>
             <tr>
                 <td data-i18n="lblLayers">Layers / Schedule</td>
-                <td id="page-m-layers">20 Layers (5 × SSSL: 15 Sliding + 5 Full)</td>
+                <td id="page-m-layers">24 Layers (6 × SSSL: 18 Sliding W=2048 + 6 Full)</td>
             </tr>
             <tr>
-                <td data-i18n="lblDim">Embedding Dim / Head Dim</td>
-                <td id="page-m-dim">1280 (10 Heads × 128 Dim · QK-RMSNorm)</td>
+                <td data-i18n="lblDim">Embedding Dim / Heads</td>
+                <td id="page-m-dim">1536 (12 Heads × 128 Dim · QK-RMSNorm)</td>
             </tr>
             <tr>
                 <td data-i18n="lblVocab">Tokenizer &amp; Vocabulary</td>
                 <td id="page-m-vocab">32,768 BPE + 21 Extended Control Tokens</td>
             </tr>
             <tr>
-                <td data-i18n="lblContext">Context Window &amp; KV Cache</td>
-                <td id="page-m-context">2,048 → 32,768 Tokens (Circular Ring KV W+1)</td>
+                <td data-i18n="lblContext">2-Stage Context &amp; RoPE</td>
+                <td id="page-m-context">8,192 (θ=100k, K=0) → 32,768 (θ=500k, K=64)</td>
+            </tr>
+            <tr>
+                <td data-i18n="lblStream">Pretraining Corpus &amp; Stream</td>
+                <td id="page-m-stream">ClimbMix + Danish Dynaword + ebib1800 (FIFO varlen)</td>
             </tr>
             <tr>
                 <td data-i18n="lblConstraints">Constrained Decoding &amp; Tools</td>
@@ -905,7 +891,7 @@
             </tr>
             <tr>
                 <td data-i18n="lblDevice">Inference Endpoint</td>
-                <td id="page-m-gpu">CUDA BFloat16 / FP8 (sg.otiumcode.com:9010)</td>
+                <td id="page-m-gpu">CUDA BFloat16 (sg.otiumcode.com:9010)</td>
             </tr>
         </table>
     </div>
@@ -938,40 +924,40 @@
             <button id="modal-close-btn" class="modal-close" aria-label="Close">✕</button>
         </div>
         <table class="info-table">
-            <tr><td data-i18n="lblModelName">Model Name</td><td id="m-name">Otium Code LLM</td></tr>
+            <tr><td data-i18n="lblModelName">Model Name</td><td id="m-name">Otium Code LLM (d24 r8)</td></tr>
             <tr><td data-i18n="lblBaseArch">Base Architecture</td><td data-i18n="valBaseArch">Based on nanochat by Karpathy</td></tr>
-            <tr><td data-i18n="lblParams">Parameter Count</td><td id="m-params">560.0M</td></tr>
-            <tr><td data-i18n="lblLayers">Layers / Depth</td><td id="m-layers">20 (SSSL Hybrid)</td></tr>
-            <tr><td data-i18n="lblDim">Embedding Dim</td><td id="m-dim">1280</td></tr>
-            <tr><td data-i18n="lblHeads">Attention Heads</td><td id="m-heads">10</td></tr>
-            <tr><td data-i18n="lblTotalCtx">Total Context Limit</td><td id="m-context">2048 – 32768 tokens</td></tr>
-            <tr><td data-i18n="lblInBudget">Input Prompt Budget</td><td id="m-in-budget">1280 – 28672 tokens</td></tr>
-            <tr><td data-i18n="lblOutBudget">Generation Buffer</td><td id="m-out-budget">768 – 4096 tokens</td></tr>
+            <tr><td data-i18n="lblParams">Parameter Count</td><td id="m-params">957.0M</td></tr>
+            <tr><td data-i18n="lblLayers">Layers / Depth</td><td id="m-layers">24 (6 × SSSL Hybrid)</td></tr>
+            <tr><td data-i18n="lblDim">Embedding Dim</td><td id="m-dim">1536</td></tr>
+            <tr><td data-i18n="lblHeads">Attention Heads</td><td id="m-heads">12 (head_dim = 128)</td></tr>
+            <tr><td data-i18n="lblTotalCtx">Total Context Limit</td><td id="m-context">8,192 → 32,768 tokens</td></tr>
+            <tr><td data-i18n="lblInBudget">Sliding Window (S)</td><td id="m-in-budget">2,048 tokens (Ring KV)</td></tr>
+            <tr><td data-i18n="lblOutBudget">RoPE Base Period (θ)</td><td id="m-out-budget">100,000 → 500,000</td></tr>
             <tr><td data-i18n="lblDevice">Inference Device</td><td id="m-gpu">NVIDIA CUDA (BF16)</td></tr>
         </table>
     </div>
 </div>
 
 <script>
-    // --- 1. Populate the 20 Static SSSL Layers inside #svg-spine-layers ---
+    // --- 1. Populate the 24 Static SSSL Layers (L00..L23) inside #svg-spine-layers ---
     (function buildStaticSpineLayers() {
         const container = document.getElementById('svg-spine-layers');
         if (!container) return;
-        const startY = 174;
-        const rowH = 20.2;
+        const startY = 172;
+        const rowH = 17.1;
+        const NUM_LAYERS = 24;
 
-        for (let i = 0; i < 20; i++) {
-            const isFull = (i % 4 === 3) || (i === 19);
-            const hasVE = (i % 2 === 1);
-            const isBackout = (i === 10);
+        for (let i = 0; i < NUM_LAYERS; i++) {
+            const isFull = (i % 4 === 3) || (i === NUM_LAYERS - 1);
+            const isBackout = (i === 11); // Midpoint of 24-layer stack
             const y = startY + i * rowH;
 
             if (i > 0 && i % 4 === 0) {
                 const sep = document.createElementNS('http://www.w3.org/2000/svg', 'line');
                 sep.setAttribute('x1', '204');
-                sep.setAttribute('y1', String(y - 1.6));
+                sep.setAttribute('y1', String(y - 1.3));
                 sep.setAttribute('x2', '396');
-                sep.setAttribute('y2', String(y - 1.6));
+                sep.setAttribute('y2', String(y - 1.3));
                 sep.setAttribute('stroke', '#333');
                 sep.setAttribute('stroke-dasharray', '2 2');
                 container.appendChild(sep);
@@ -981,35 +967,32 @@
             rect.setAttribute('x', '206');
             rect.setAttribute('y', String(y));
             rect.setAttribute('width', '188');
-            rect.setAttribute('height', '16.5');
-            rect.setAttribute('rx', '3');
+            rect.setAttribute('height', '14.2');
+            rect.setAttribute('rx', '2.5');
             rect.setAttribute('fill', isFull ? '#292014' : '#162417');
-            rect.setAttribute('stroke', isFull ? '#FFB74D' : '#4CAF50');
-            rect.setAttribute('stroke-width', isFull ? '1.3' : '0.9');
+            rect.setAttribute('stroke', isBackout ? '#CE93D8' : (isFull ? '#FFB74D' : '#4CAF50'));
+            rect.setAttribute('stroke-width', (isFull || isBackout) ? '1.3' : '0.85');
             container.appendChild(rect);
 
             const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             label.setAttribute('x', '213');
-            label.setAttribute('y', String(y + 11.4));
+            label.setAttribute('y', String(y + 10.1));
             label.setAttribute('fill', isFull ? '#FFB74D' : '#66BB6A');
             label.setAttribute('font-family', 'monospace');
-            label.setAttribute('font-size', '8.2');
+            label.setAttribute('font-size', '7.7');
             label.setAttribute('font-weight', isFull ? 'bold' : 'normal');
             label.textContent = 'L' + String(i).padStart(2, '0') + (isFull ? ' FULL (L)' : ' SLIDE (S)');
             container.appendChild(label);
 
-            const tags = ['x₀', 'ReLU²'];
-            if (hasVE) tags.unshift('VE');
-            if (isBackout) tags.unshift('BACKOUT');
-
             const meta = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             meta.setAttribute('x', '388');
-            meta.setAttribute('y', String(y + 11.4));
+            meta.setAttribute('y', String(y + 10.1));
             meta.setAttribute('text-anchor', 'end');
-            meta.setAttribute('fill', '#999');
+            meta.setAttribute('fill', isBackout ? '#CE93D8' : '#999');
             meta.setAttribute('font-family', 'monospace');
-            meta.setAttribute('font-size', '7.3');
-            meta.textContent = tags.join('·');
+            meta.setAttribute('font-size', '7.1');
+            meta.setAttribute('font-weight', isBackout ? 'bold' : 'normal');
+            meta.textContent = isBackout ? 'BACKOUT · ReLU²' : (isFull ? '32K KV · ReLU²' : 'W=2048 · ReLU²');
             container.appendChild(meta);
         }
     })();
@@ -1021,86 +1004,86 @@
     const FORMULAS = {
         en: [
             {
-                title: "Complete Network Overview (All Primitives)",
+                title: "Complete Network Overview (All Primitives · d24 r8)",
                 sub: "Click any primitive block in the diagram or card list to inspect its exact equation.",
-                code: "idx (B,T) → wte[idx] → 20× SSSL Layers → lm_head → 15·tanh(z/15) → C++20 PDA Mask"
+                code: "idx (B,T) → wte[idx] → 24× SSSL Layers → lm_head → 15·tanh(z/15) → C++20 PDA Mask"
             },
             {
                 title: "01. Input Gather — Continuous FIFO Stream, Untied wte Lookup & Smear Gate",
-                sub: "Gathers token vectors e_{t-1} and e_t from untied wte (32,768 × 1,280), blends bigram state, and applies initial RMSNorm.",
-                code: "x₀ = RMSNorm( wte[idx_t] + λ_smear · σ(smear_gate(x)) · wte[idx_{t-1}] )"
+                sub: "Gathers token vectors e(t−1) and e(t) from untied wte (32,768 × 1,536), blends bigram state, and applies initial RMSNorm.",
+                code: "x₀ = RMSNorm( wte[idx_t] + λ_smear · σ(smear_gate(x)) · wte[idx_{t−1}] )"
             },
             {
-                title: "02. 20-Layer 'SSSL' Hybrid Attention Schedule",
-                sub: "15 Sliding-Window ('S') layers and 5 Full Global ('L') layers (L03, L07, L11, L15, L19) with QK-RMSNorm.",
-                code: "Pattern = ['S','S','S','L'] × 5  |  AttnScale = 1.2 / sqrt(128)  |  flash_attn_varlen"
+                title: "02. 24-Layer 'SSSL' Hybrid Attention Schedule (6 × SSSL)",
+                sub: "18 Sliding-Window ('S', W=2,048) layers and 6 Full Global ('L') layers (L03, L07, L11, L15, L19, L23) with QK-RMSNorm.",
+                code: "Pattern = ['S','S','S','L'] × 6  |  AttnScale = 1.2 / sqrt(128)  |  flash_attn_varlen"
             },
             {
-                title: "03. Residual Highways — x₀ Scalars, Alternating Value Embeddings & L10 Backout",
-                sub: "Every layer mixes initial x₀; odd layers add gated token Value Embeddings to V; Layer 10 residual is backed out.",
-                code: "x ← λ_resid·x + λ_x0·x₀   |   v += 2·σ(ve_gate(x))·VE[idx]   |   x_out ← x − λ_back·x_10"
+                title: "03. Mid-Network Residual Backout (Layer 11 → Pre-Final Norm)",
+                sub: "Caches the residual stream x_mid at midpoint Layer 11 and subtracts λ_backout · x_mid before the final RMSNorm.",
+                code: "x_mid = x_11   →   x_final = RMSNorm( x_23 − λ_backout · x_mid )"
             },
             {
-                title: "04. Circular Ring-Buffer KV Cache & Long-Context RoPE",
-                sub: "Sliding-window layers overwrite a bounded (W + 1) circular buffer in-place during decoding.",
-                code: "write_slot = pos % (W + 1)   |   RoPE θ = 100,000 → 500,000 (32K context)"
+                title: "04. Circular Ring-Buffer KV Cache & 8K → 32K RoPE Extension",
+                sub: "18 Sliding-window layers overwrite a bounded (W + 1 = 2,049) circular buffer in-place during decoding.",
+                code: "write_slot = pos % 2049   |   RoPE θ = 100,000 (8K Stage 1) → 500,000 (32K Stage 2)"
             },
             {
                 title: "05. ReLU² Sparse MLP, Rejection Sampling (K=4) & On-Policy GRPO RL",
-                sub: "Squared ReLU induces ~75%+ neuron sparsity; post-training combines Qwen-judged RFT and DAPO token-normalized GRPO.",
-                code: "MLP(x) = ReLU(x · W_fc)² · W_proj   |   L_GRPO = -(r_i - μ_r) · log π_θ(y_t | mask==1)"
+                sub: "Squared ReLU induces >75% neuron sparsity; post-training combines Qwen-judged RFT and DAPO token-normalized GRPO.",
+                code: "MLP(x) = ReLU(x · W_fc)² · W_proj   |   L_GRPO = −(r_i − mean(r)) · log π_θ(y_t | mask==1)"
             },
             {
                 title: "06. Output Logits — Final RMSNorm, Untied lm_head & Tanh Softcap",
-                sub: "Projects hidden states to 32,768 vocabulary logits and smoothly caps magnitude at 15.0.",
-                code: "z = 15.0 · tanh( (RMSNorm(x − λ_back·x_10) · W_lm_head) / 15.0 )"
+                sub: "Projects 1,536-dim hidden states to 32,768 vocabulary logits and smoothly caps magnitude at 15.0.",
+                code: "z = 15.0 · tanh( (RMSNorm(x_23 − λ_backout · x_11) · W_lm_head) / 15.0 )"
             },
             {
                 title: "07. C++20 Pushdown Automaton Grammar Mask & Live AST Calculator",
-                sub: "Validates all 32,768 tokens in <0.5 ms per step, setting illegal logits to -∞ and executing calculator expressions.",
-                code: "z_constrained[v] = PDA_Valid(state, token_bytes[v]) ? z[v] : -∞"
+                sub: "Validates all 32,768 tokens in <0.5 ms per step, setting illegal logits to −∞ and executing calculator expressions.",
+                code: "z_constrained[v] = PDA_Valid(state, token_bytes[v]) ? z[v] : −∞"
             }
         ],
         da: [
             {
-                title: "Komplet Netværks-Overblik (Alle Primitiver)",
+                title: "Komplet Netværks-Overblik (Alle Primitiver · d24 r8)",
                 sub: "Klik på en blok i diagrammet eller et kort til højre for at se den præcise ligning.",
-                code: "idx (B,T) → wte[idx] → 20× SSSL Lag → lm_head → 15·tanh(z/15) → C++20 PDA Mask"
+                code: "idx (B,T) → wte[idx] → 24× SSSL Lag → lm_head → 15·tanh(z/15) → C++20 PDA Mask"
             },
             {
                 title: "01. Input Gather — Kontinuerlig FIFO-Strøm, Untied wte & Smear Gate",
-                sub: "Slår token-vektorer e_{t-1} og e_t op i wte (32.768 × 1.280), blander forrige token og normaliserer til x₀.",
-                code: "x₀ = RMSNorm( wte[idx_t] + λ_smear · σ(smear_gate(x)) · wte[idx_{t-1}] )"
+                sub: "Slår token-vektorer e(t−1) og e(t) op i wte (32.768 × 1.536), blander forrige token og normaliserer til x₀.",
+                code: "x₀ = RMSNorm( wte[idx_t] + λ_smear · σ(smear_gate(x)) · wte[idx_{t−1}] )"
             },
             {
-                title: "02. 20-Lags 'SSSL' Hybrid Attention-Struktur",
-                sub: "15 Sliding-Window ('S') lag og 5 Full Global ('L') lag (L03, L07, L11, L15, L19) med QK-RMSNorm.",
-                code: "Pattern = ['S','S','S','L'] × 5  |  AttnScale = 1.2 / sqrt(128)  |  flash_attn_varlen"
+                title: "02. 24-Lags 'SSSL' Hybrid Attention-Struktur (6 × SSSL)",
+                sub: "18 Sliding-Window ('S', W=2.048) lag og 6 Full Global ('L') lag (L03, L07, L11, L15, L19, L23) med QK-RMSNorm.",
+                code: "Pattern = ['S','S','S','L'] × 6  |  AttnScale = 1.2 / sqrt(128)  |  flash_attn_varlen"
             },
             {
-                title: "03. Residual-Highways — x₀-Vægte, Value Embeddings & L10 Backout",
-                sub: "Hvert lag blander x₀ direkte; ulige lag tilføjer Value Embeddings i V; Lag 10 trækkes fra før sidste norm.",
-                code: "x ← λ_resid·x + λ_x0·x₀   |   v += 2·σ(ve_gate(x))·VE[idx]   |   x_out ← x − λ_back·x_10"
+                title: "03. Midt-Netværk Residual Backout (Lag 11 → Før Sidste Norm)",
+                sub: "Gemmer residual-tilstanden x_mid ved midtpunktet Lag 11 og trækker λ_backout · x_mid fra før sidste RMSNorm.",
+                code: "x_mid = x_11   →   x_final = RMSNorm( x_23 − λ_backout · x_mid )"
             },
             {
-                title: "04. Cirkulær Ring-Buffer KV-Cache & 32K RoPE",
-                sub: "Sliding-window lag skriver i en fast (W + 1) cirkulær ring-buffer under dekodning.",
-                code: "write_slot = pos % (W + 1)   |   RoPE θ = 100.000 → 500.000 (32K kontekst)"
+                title: "04. Cirkulær Ring-Buffer KV-Cache & 8K → 32K RoPE-Udvidelse",
+                sub: "De 18 Sliding-window lag skriver i en fast (W + 1 = 2.049) cirkulær ring-buffer under dekodning.",
+                code: "write_slot = pos % 2049   |   RoPE θ = 100.000 (8K Trin 1) → 500.000 (32K Trin 2)"
             },
             {
                 title: "05. ReLU² Sparse MLP, Rejection Sampling (K=4) & On-Policy GRPO RL",
                 sub: "Kvadreret ReLU giver >75% aktiverings-sparsity; eftertræning kombinerer K=4 RFT og GRPO RL.",
-                code: "MLP(x) = ReLU(x · W_fc)² · W_proj   |   L_GRPO = -(r_i - μ_r) · log π_θ(y_t | mask==1)"
+                code: "MLP(x) = ReLU(x · W_fc)² · W_proj   |   L_GRPO = −(r_i − mean(r)) · log π_θ(y_t | mask==1)"
             },
             {
                 title: "06. Output Logits — Final RMSNorm, Untied lm_head & Tanh Softcap",
-                sub: "Projicerer skjulte tilstande til 32.768 logits og begrænser dem blødt ved 15,0.",
-                code: "z = 15.0 · tanh( (RMSNorm(x − λ_back·x_10) · W_lm_head) / 15.0 )"
+                sub: "Projicerer 1.536-dim skjulte tilstande til 32.768 logits og begrænser dem blødt ved 15,0.",
+                code: "z = 15.0 · tanh( (RMSNorm(x_23 − λ_backout · x_11) · W_lm_head) / 15.0 )"
             },
             {
                 title: "07. C++20 Pushdown-Automat Grammatik-Maske & AST-Lommeregner",
-                sub: "Validerer alle 32.768 tokens på <0,5 ms pr. skridt og sætter ugyldige logits til -∞.",
-                code: "z_constrained[v] = PDA_Valid(state, token_bytes[v]) ? z[v] : -∞"
+                sub: "Validerer alle 32.768 tokens på <0,5 ms pr. skridt og sætter ugyldige logits til −∞.",
+                code: "z_constrained[v] = PDA_Valid(state, token_bytes[v]) ? z[v] : −∞"
             }
         ]
     };
@@ -1130,55 +1113,56 @@
         document.getElementById('formula-code').textContent = f.code;
     }
 
-    // --- 3. Bilingual Language Switcher (English / Dansk) ---
+    // --- 3. Bilingual Language Switcher (English / Dansk — Pure HTML Sub/Sup, Zero Raw LaTeX) ---
     const I18N = {
         en: {
             backToSite: "Back to Site",
             openAiChat: "💬 Open AI Chat",
             modelInfoBtn: "Model & Inference Info",
             aboutTitle: "Otium Code LLM — Network Primitives & Architecture",
-            aboutP1: "Otium Code LLM is a bilingual (Danish and English) autoregressive Transformer engineered for 32K long-context reasoning, lossless continuous FIFO token streaming, C++20 grammar-constrained decoding, live AST calculator execution, and rejection-sampled reinforcement learning.",
+            aboutP1: "Otium Code LLM is a 24-layer bilingual (Danish and English) autoregressive Transformer engineered for two-stage 8K &rarr; 32K long-context reasoning, lossless continuous FIFO token streaming, C++20 grammar-constrained decoding, live AST calculator execution, and rejection-sampled reinforcement learning.",
             aboutP2: "The interactive schematic below illustrates every primitive in the network from <strong>Input Gather</strong> to <strong>Output Logits</strong>. Click any block in the diagram or any card on the right to isolate and inspect that primitive.",
             diagramHeading: "Network Architecture: Input Gather to Output Logits",
             resetViewBtn: "Show All Primitives",
             legGather: "Input Gather",
-            legSwa: "15 Sliding (S)",
-            legFull: "5 Full (L)",
-            legRes: "x₀ / VE / Backout",
+            legSwa: "18 Sliding (S)",
+            legFull: "6 Full (L)",
+            legRes: "Mid Backout",
             legPda: "C++20 PDA Mask",
             c0Tag: "ALL PRIMITIVES",
             c0Title: "Complete Network Overview",
-            c0Desc: "Shows the full forward and decoding path from continuous token ingestion and input embedding gather through the 20-layer hybrid stack to grammar-constrained output logits.",
+            c0Desc: "Shows the complete forward and decoding path from continuous FIFO token ingestion and input embedding gather through the 24-layer SSSL stack to grammar-constrained output logits.",
             c1Title: "Continuous FIFO Stream & wte Gather",
-            c1Desc: 'Tokens enter from a lossless FIFO stream (<span class="chip chip-gather">overlap K=0/64</span>, intra-doc boundary mask). Token IDs gather vector rows e_{t-1}, e_t from the untied <code>wte</code> matrix, mix bigram context via <code>smear_gate</code>, and normalize to x₀.',
-            c2Title: "20-Layer Hybrid SSSL Attention Spine",
-            c2Desc: 'Five blocks of four layers: 15 <span class="chip chip-swa">Sliding Window (S)</span> layers capture local positional order, while 5 <span class="chip chip-full">Full Global (L)</span> layers (<code>L03, L07, L11, L15, L19</code>) attend across the entire 32K sequence.',
-            c3Title: "x₀ Highway, Value Embeddings & Backout",
-            c3Desc: 'Each layer mixes initial x₀ via <span class="chip chip-res">resid_lambdas</span> and <span class="chip chip-res">x0_lambdas</span>. Odd layers inject gated token <span class="chip chip-res">Value Embeddings (VE)</span> into attention V, and Layer 10\'s residual is subtracted via <code>backout_lambda</code>.',
+            c1Desc: 'Tokens enter from a lossless FIFO stream (<span class="chip chip-gather">overlap K=0 &rarr; 64</span>, intra-doc boundary mask). Token IDs gather vector rows e<sub>t&minus;1</sub> and e<sub>t</sub> from the untied <code>wte</code> matrix, blend bigram context via <code>smear_gate</code>, and normalize to x<sub>0</sub>.',
+            c2Title: "24-Layer Hybrid SSSL Attention Spine",
+            c2Desc: 'Six blocks of four layers: 18 <span class="chip chip-swa">Sliding Window (S)</span> layers (W = 2,048) capture local positional order, while 6 <span class="chip chip-full">Full Global (L)</span> layers (<code>L03, L07, L11, L15, L19, L23</code>) attend across the full 32K sequence.',
+            c3Title: "Mid-Network Residual Backout",
+            c3Desc: 'At the midpoint of the 24-layer stack (<code>L11</code>), the residual stream x<sub>mid</sub> is cached. Before the final RMSNorm, <span class="chip chip-res">&lambda;<sub>backout</sub> &middot; x<sub>mid</sub></span> is subtracted from the final hidden state so early surface features do not crowd the output logits.',
             c4Title: "Bounded Ring-Buffer KV & 32K RoPE",
-            c4Desc: 'During decoding, the 15 <span class="chip chip-swa">S</span> layers wrap writes inside a fixed (W + 1) circular ring buffer rather than growing linearly, paired with 1.2× QK-RMSNorm and θ = 100k → 500k RoPE.',
+            c4Desc: 'During decoding, the 18 <span class="chip chip-swa">S</span> layers wrap writes inside a fixed (W + 1 = 2,049) circular ring buffer rather than growing linearly, paired with 1.2&times; QK-RMSNorm and RoPE &theta; = 100,000 (8K) &rarr; 500,000 (32K).',
             c5Title: "ReLU² Sparsity, Rejection Sampling & RL",
-            c5Desc: 'MLPs apply squared <span class="chip chip-swa">ReLU(x)²</span> for natural activation sparsity. Post-training runs K=4 Rejection Sampling with live calculator execution and on-policy GRPO RL (A_i = r_i - μ_r).',
+            c5Desc: 'MLPs apply squared <span class="chip chip-swa">ReLU(x)<sup>2</sup></span> for natural activation sparsity. Post-training runs K=4 Rejection Sampling with live calculator execution and on-policy GRPO RL (A<sub>i</sub> = r<sub>i</sub> &minus; r&#772;).',
             c6Title: "Untied lm_head & Tanh Logit Softcap",
-            c6Desc: "Final normalized hidden states project through the untied <code>lm_head</code> to 32,768 vocabulary logits and are smoothly bounded by 15.0·tanh(z/15.0) with chunked cross-entropy training.",
+            c6Desc: "Final normalized hidden states project through the untied <code>lm_head</code> to 32,768 vocabulary logits and are smoothly bounded by 15.0 &middot; tanh(z / 15.0) with chunked cross-entropy training.",
             c7Title: "C++20 Pushdown Automaton & AST Tool",
-            c7Desc: 'A native C++20 byte automaton validates all 32,768 next tokens per step across 5 grammar modes, setting illegal logits to <span class="chip chip-pda">-∞</span> and intercepting <code>&lt;|tool_end|&gt;</code> for sandboxed AST math evaluation.',
+            c7Desc: 'A native C++20 byte automaton validates all 32,768 next tokens per step across 5 grammar modes, setting illegal logits to <span class="chip chip-pda">&minus;&infin;</span> and intercepting <code>&lt;|tool_end|&gt;</code> for sandboxed AST math evaluation.',
             infoSectionTitle: "Model & Inference Information",
             lblModelName: "Model Name",
             lblBaseArch: "Base Architecture",
             valBaseArch: "Based on nanochat by Karpathy",
             lblParams: "Parameter Count",
             lblLayers: "Layers / Schedule",
-            lblDim: "Embedding Dim / Head Dim",
+            lblDim: "Embedding Dim / Heads",
             lblVocab: "Tokenizer & Vocabulary",
-            lblContext: "Context Window & KV Cache",
+            lblContext: "2-Stage Context & RoPE",
+            lblStream: "Pretraining Corpus & Stream",
             lblConstraints: "Constrained Decoding & Tools",
             lblPostTrain: "Post-Training & Optimizer",
             lblDevice: "Inference Endpoint",
             lblHeads: "Attention Heads",
             lblTotalCtx: "Total Context Limit",
-            lblInBudget: "Input Prompt Budget",
-            lblOutBudget: "Generation Buffer",
+            lblInBudget: "Sliding Window (S)",
+            lblOutBudget: "RoPE Base Period (θ)",
             ctaHeading: "Interact with the Model or Return to Otium Code",
             ctaSub: "Test live streaming generation in the AI Chat interface or return to the main consultancy page.",
             backMainBtn: "Back to Otium Code",
@@ -1190,48 +1174,49 @@
             openAiChat: "💬 Åbn AI Chat",
             modelInfoBtn: "Model & Inferens Info",
             aboutTitle: "Otium Code LLM — Netværks-Primitiver & Arkitektur",
-            aboutP1: "Otium Code LLM er en tosproget (dansk og engelsk) autoregressiv Transformer udviklet til 32K lang-kontekst ræsonnering, tabsfri kontinuerlig FIFO-tokenstreaming, C++20 grammatikstyret dekodning, live AST-lommeregner og rejection-samplet reinforcement learning.",
+            aboutP1: "Otium Code LLM er en 24-lags tosproget (dansk og engelsk) autoregressiv Transformer udviklet til 2-trins 8K &rarr; 32K lang-kontekst ræsonnering, tabsfri kontinuerlig FIFO-tokenstreaming, C++20 grammatikstyret dekodning, live AST-lommeregner og rejection-samplet reinforcement learning.",
             aboutP2: "Det interaktive diagram herunder viser samtlige primitiver i netværket fra <strong>Input Gather</strong> til <strong>Output Logits</strong>. Klik på en blok i diagrammet eller et kort til højre for at fremhæve og inspicere den enkelte primitiv.",
             diagramHeading: "Netværksarkitektur: Fra Input Gather til Output Logits",
             resetViewBtn: "Vis Alle Primitiver",
             legGather: "Input Gather",
-            legSwa: "15 Sliding (S)",
-            legFull: "5 Full (L)",
-            legRes: "x₀ / VE / Backout",
+            legSwa: "18 Sliding (S)",
+            legFull: "6 Full (L)",
+            legRes: "Mid Backout",
             legPda: "C++20 PDA-Maske",
             c0Tag: "ALLE PRIMITIVER",
             c0Title: "Komplet Netværks-Overblik",
-            c0Desc: "Viser hele vejen fra kontinuerlig token-streaming og opslag i input-tabellen gennem de 20 hybride lag til grammatikstyrede output-logits.",
+            c0Desc: "Viser hele vejen fra kontinuerlig FIFO-tokenstreaming og opslag i input-tabellen gennem de 24 SSSL-lag til grammatikstyrede output-logits.",
             c1Title: "Kontinuerlig FIFO-Strøm & wte Gather",
-            c1Desc: 'Tokens læses fra en tabsfri FIFO-strøm (<span class="chip chip-gather">overlap K=0/64</span>, intra-doc maske). Token-ID\'er slår rækkerne e_{t-1}, e_t op i <code>wte</code>-matricen, blander kontekst via <code>smear_gate</code> og normaliserer til x₀.',
-            c2Title: "20-Lags Hybrid SSSL Attention-Rygrad",
-            c2Desc: 'Fem blokke af fire lag: 15 <span class="chip chip-swa">Sliding Window (S)</span>-lag fanger lokal ordstilling, mens 5 <span class="chip chip-full">Full Global (L)</span>-lag (<code>L03, L07, L11, L15, L19</code>) ser hele sekvensen på 32K tokens.',
-            c3Title: "x₀-Highway, Value Embeddings & Backout",
-            c3Desc: 'Hvert lag blander det oprindelige x₀ via <span class="chip chip-res">resid_lambdas</span> og <span class="chip chip-res">x0_lambdas</span>. Ulige lag tilføjer <span class="chip chip-res">Value Embeddings (VE)</span> i attention V, og Lag 10 trækkes fra via <code>backout_lambda</code>.',
+            c1Desc: 'Tokens læses fra en tabsfri FIFO-strøm (<span class="chip chip-gather">overlap K=0 &rarr; 64</span>, intra-doc maske). Token-ID\'er slår rækkerne e<sub>t&minus;1</sub> og e<sub>t</sub> op i <code>wte</code>-matricen, blander kontekst via <code>smear_gate</code> og normaliserer til x<sub>0</sub>.',
+            c2Title: "24-Lags Hybrid SSSL Attention-Rygrad",
+            c2Desc: 'Seks blokke af fire lag: 18 <span class="chip chip-swa">Sliding Window (S)</span>-lag (W = 2.048) fanger lokal ordstilling, mens 6 <span class="chip chip-full">Full Global (L)</span>-lag (<code>L03, L07, L11, L15, L19, L23</code>) ser hele sekvensen på 32K tokens.',
+            c3Title: "Midt-Netværk Residual Backout",
+            c3Desc: 'Ved midtpunktet af de 24 lag (<code>L11</code>) gemmes residual-strømmen x<sub>mid</sub>. Før den sidste RMSNorm trækkes <span class="chip chip-res">&lambda;<sub>backout</sub> &middot; x<sub>mid</sub></span> fra, så tidlige overfladetræk ikke forstyrrer output-logits.',
             c4Title: "Cirkulær Ring-Buffer KV & 32K RoPE",
-            c4Desc: 'Under dekodning skriver de 15 <span class="chip chip-swa">S</span>-lag i en fast (W + 1) cirkulær ring-buffer fremfor at vokse lineært, kombineret med 1.2× QK-RMSNorm og θ = 100k → 500k RoPE.',
+            c4Desc: 'Under dekodning skriver de 18 <span class="chip chip-swa">S</span>-lag i en fast (W + 1 = 2.049) cirkulær ring-buffer fremfor at vokse lineært, kombineret med 1.2&times; QK-RMSNorm og RoPE &theta; = 100.000 (8K) &rarr; 500.000 (32K).',
             c5Title: "ReLU² Sparsity, Rejection Sampling & RL",
-            c5Desc: 'MLP-lagene anvender kvadreret <span class="chip chip-swa">ReLU(x)²</span> for naturlig sparsity. Eftertræning kører K=4 Rejection Sampling med live lommeregner samt on-policy GRPO RL (A_i = r_i - μ_r).',
+            c5Desc: 'MLP-lagene anvender kvadreret <span class="chip chip-swa">ReLU(x)<sup>2</sup></span> for naturlig sparsity. Eftertræning kører K=4 Rejection Sampling med live lommeregner samt on-policy GRPO RL (A<sub>i</sub> = r<sub>i</sub> &minus; r&#772;).',
             c6Title: "Untied lm_head & Tanh Logit Softcap",
-            c6Desc: "De sidste normaliserede tilstande projiceres gennem <code>lm_head</code> til 32.768 logits og afgrænses blødt med 15.0·tanh(z/15.0) samt chunked cross-entropy.",
+            c6Desc: "De sidste normaliserede tilstande projiceres gennem <code>lm_head</code> til 32.768 logits og afgrænses blødt med 15.0 &middot; tanh(z / 15.0) samt chunked cross-entropy.",
             c7Title: "C++20 Pushdown-Automat & AST-Værktøj",
-            c7Desc: 'En C++20 byte-automat validerer alle 32.768 mulige næste tokens pr. skridt på <0,5 ms, sætter ugyldige logits til <span class="chip chip-pda">-∞</span> og evaluerer matematik via <code>&lt;|tool_end|&gt;</code>.',
+            c7Desc: 'En C++20 byte-automat validerer alle 32.768 mulige næste tokens pr. skridt på &lt;0,5 ms, sætter ugyldige logits til <span class="chip chip-pda">&minus;&infin;</span> og evaluerer matematik via <code>&lt;|tool_end|&gt;</code>.',
             infoSectionTitle: "Model & Inferens Information",
             lblModelName: "Modelnavn",
             lblBaseArch: "Basisarkitektur",
             valBaseArch: "Baseret på nanochat af Karpathy",
             lblParams: "Antal Parametre",
             lblLayers: "Lag / Struktur",
-            lblDim: "Embedding-Dim / Head-Dim",
+            lblDim: "Embedding-Dim / Heads",
             lblVocab: "Tokenizer & Vokabular",
-            lblContext: "Kontekstvindue & KV-Cache",
+            lblContext: "2-Trins Kontekst & RoPE",
+            lblStream: "Træningskorpus & Strøm",
             lblConstraints: "Styret Dekodning & Værktøj",
             lblPostTrain: "Eftertræning & Optimizer",
             lblDevice: "Inferens-Endpoint",
             lblHeads: "Attention Heads",
             lblTotalCtx: "Maks. Kontekstgrænse",
-            lblInBudget: "Input Prompt-Budget",
-            lblOutBudget: "Genererings-Buffer",
+            lblInBudget: "Sliding Window (S)",
+            lblOutBudget: "RoPE Basisperiode (θ)",
             ctaHeading: "Afprøv Modellen eller Vend Tilbage til Otium Code",
             ctaSub: "Test live streaming-generering i vores AI Chat eller gå tilbage til hovedsiden.",
             backMainBtn: "Tilbage til Otium Code",
