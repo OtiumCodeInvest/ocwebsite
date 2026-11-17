@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Otium Code — LLM Architecture & Network Primitives</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* --- Header Navigation (Matches en.html / da.html / chat.html) --- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0 15px 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn-nav {
+            background-color: #1a1a1a;
+            color: #ccc;
+            border: 1px solid #333;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-family: inherit;
+        }
+        .btn-nav:hover {
+            background-color: #242424;
+            color: #fff;
+            border-color: #4CAF50;
+        }
+        .btn-nav.green {
+            background-color: #4CAF50;
+            color: #fff;
+            border-color: #4CAF50;
+            font-weight: 600;
+        }
+        .btn-nav.green:hover {
+            background-color: #45a049;
+        }
+
+        .header-right {
+            text-align: right;
+        }
+        .header-right a {
+            color: #888;
+            text-decoration: none;
+            margin-left: 8px;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+        .header-right a:hover {
+            color: #ccc;
+        }
+        .header-right a.active {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        /* --- Hero Interactive Logo Section (Exact from da.html / en.html) --- */
+        .logo-section {
+            position: relative;
+            width: 100%;
+            height: 260px;
+            margin-bottom: 35px;
+            background-color: #7d7d7d;
+            border-radius: 6px;
+            border: 1px solid #333;
+            overflow: hidden;
+            cursor: crosshair;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .logo-section canvas {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* --- About Section (Exact from da.html / en.html) --- */
+        .about-section {
+            margin-bottom: 35px;
+            padding: 25px 30px;
+            background-color: #151515;
+            border-radius: 6px;
+            border-left: 4px solid #4CAF50;
+            font-size: 1.05rem;
+        }
+        .about-section h1 {
+            margin: 0 0 12px 0;
+            color: #fff;
+            font-size: 1.5rem;
+        }
+        .about-section p {
+            margin: 0 0 14px 0;
+            color: #d0d0d0;
+        }
+        .about-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* --- Sevren-Style Static Primitives Section --- */
+        .projects-section {
+            margin-bottom: 35px;
+            padding: 26px 22px;
+            background-color: #1a1a1a;
+            border-radius: 6px;
+            border: 1px solid #2a2a2a;
+            position: relative;
+        }
+        .section-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .section-title-row h2 {
+            color: #fff;
+            margin: 0;
+            font-size: 1.25rem;
+        }
+
+        .arch-layout {
+            display: grid;
+            grid-template-columns: 1.25fr 0.95fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        /* Left Column: Static SVG Board */
+        .svg-board-wrapper {
+            background: #141414;
+            border: 1px solid #2c2c2c;
+            border-radius: 6px;
+            padding: 14px;
+        }
+        .svg-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-family: monospace;
+            font-size: 0.76rem;
+            color: #aaa;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #242424;
+        }
+        .legend-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            display: inline-block;
+        }
+
+        .arch-svg {
+            width: 100%;
+            height: auto;
+            display: block;
+            user-select: none;
+        }
+
+        .svg-prim {
+            cursor: pointer;
+            transition: opacity 0.15s ease;
+        }
+        .svg-prim.dimmed {
+            opacity: 0.22;
+        }
+        .svg-prim.highlighted {
+            opacity: 1.0;
+        }
+
+        /* Right Column: Clickable Primitive Cards */
+        .prim-cards-col {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+        .prim-card {
+            background: #222222;
+            border: 1px solid #333;
+            border-left: 3px solid #3a3a3a;
+            border-radius: 6px;
+            padding: 11px 14px;
+            cursor: pointer;
+            transition: background 0.15s ease, border-color 0.15s ease;
+        }
+        .prim-card:hover {
+            background: #262626;
+            border-color: #4a4a4a;
+        }
+        .prim-card.active {
+            background: #172018;
+            border-color: #4CAF50;
+            border-left: 4px solid #4CAF50;
+        }
+        .prim-card-meta {
+            display: flex;
+            justify-content: space-between;
+            font-family: monospace;
+            font-size: 0.74rem;
+            color: #888;
+            margin-bottom: 3px;
+        }
+        .prim-card.active .prim-card-meta .step-tag {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .prim-card h3 {
+            margin: 0 0 4px 0;
+            color: #fff;
+            font-size: 0.95rem;
+        }
+        .prim-card p {
+            margin: 0;
+            font-size: 0.83rem;
+            color: #bbb;
+            line-height: 1.42;
+        }
+
+        /* Inline Semantic Pills */
+        .chip {
+            display: inline-block;
+            padding: 0 5px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 0.84em;
+            font-weight: 600;
+        }
+        .chip-gather { background: rgba(100, 181, 246, 0.15); color: #64B5F6; border: 1px solid rgba(100, 181, 246, 0.35); }
+        .chip-swa    { background: rgba(76, 175, 80, 0.16);   color: #66BB6A; border: 1px solid rgba(76, 175, 80, 0.4); }
+        .chip-full   { background: rgba(255, 183, 77, 0.16);  color: #FFB74D; border: 1px solid rgba(255, 183, 77, 0.4); }
+        .chip-res    { background: rgba(206, 147, 216, 0.15); color: #CE93D8; border: 1px solid rgba(206, 147, 216, 0.35); }
+        .chip-pda    { background: rgba(239, 154, 154, 0.15); color: #EF9A9A; border: 1px solid rgba(239, 154, 154, 0.35); }
+
+        /* Selected Primitive Equation Bar below Diagram */
+        .formula-bar {
+            margin-top: 18px;
+            padding: 15px 18px;
+            background: #171717;
+            border: 1px solid #2b2b2b;
+            border-left: 3px solid #4CAF50;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .formula-bar-title {
+            font-weight: 600;
+            color: #fff;
+            font-size: 0.94rem;
+            margin-bottom: 3px;
+        }
+        .formula-bar-sub {
+            font-size: 0.84rem;
+            color: #aaa;
+        }
+        .formula-box {
+            font-family: monospace;
+            font-size: 0.83rem;
+            color: #4CAF50;
+            background: #101010;
+            padding: 7px 11px;
+            border-radius: 4px;
+            border: 1px solid #282828;
+        }
+
+        /* --- Model & Inference Information Section (Matches chat.html table) --- */
+        .info-card-section {
+            margin-bottom: 35px;
+            padding: 25px;
+            background: #171717;
+            border: 1px solid #262626;
+            border-radius: 6px;
+        }
+        .info-card-section h2 {
+            margin: 0 0 14px 0;
+            color: #fff;
+            font-size: 1.2rem;
+            border-bottom: 1px solid #282828;
+            padding-bottom: 10px;
+        }
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.92rem;
+        }
+        .info-table td {
+            padding: 8px 4px;
+            border-bottom: 1px solid #242424;
+        }
+        .info-table td:first-child {
+            color: #999;
+        }
+        .info-table td:last-child {
+            text-align: right;
+            font-family: monospace;
+            color: #4CAF50;
+        }
+
+        /* --- Redirect Action Bar --- */
+        .redirect-cta-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            padding: 22px 25px;
+            background: #1f1f1f;
+            border: 1px solid #333;
+            border-radius: 6px;
+            margin-bottom: 35px;
+        }
+        .redirect-cta-bar h3 {
+            margin: 0 0 4px 0;
+            color: #fff;
+            font-size: 1.1rem;
+        }
+        .redirect-cta-bar p {
+            margin: 0;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        .redirect-btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* --- Modal Styles (Exact from chat.html) --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.72);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal {
+            background: #1c1c1c;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 24px;
+            width: 90%;
+            max-width: 500px;
+            color: #e0e0e0;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #282828;
+            padding-bottom: 8px;
+        }
+        .modal-header h3 {
+            margin: 0;
+            color: #fff;
+            font-size: 1.1rem;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        .modal-close:hover {
+            color: #fff;
+        }
+
+        /* --- Footer Section (Exact from da.html / en.html) --- */
+        .footer {
+            margin-top: 40px;
+            padding: 25px 20px;
+            background: #101010;
+            border-radius: 6px;
+            border-top: 2px solid #222;
+            text-align: center;
+            color: #888;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 840px) {
+            .arch-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 600px) {
+            .logo-section {
+                height: 220px;
+            }
+        }
+    </style>
+
+    <!-- Three.js + Font Loaders -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FontLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/TextGeometry.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <!-- Top Header Navigation -->
+    <div class="header">
+        <div class="header-left">
+            <a href="en.html" id="top-back-link" class="btn-nav">← <span data-i18n="backToSite">Back to Site</span></a>
+            <a href="chat.html" class="btn-nav green"><span data-i18n="openAiChat">💬 Open AI Chat</span></a>
+            <button id="open-info-modal-btn" class="btn-nav" type="button">ⓘ <span data-i18n="modelInfoBtn">Model &amp; Inference Info</span></button>
+        </div>
+        <div class="header-right">
+            <a id="lang-da" onclick="setLanguage('da')">Dansk</a> |
+            <a id="lang-en" class="active" onclick="setLanguage('en')">English</a>
+        </div>
+    </div>
+
+    <!-- 3D Shadow Illusion Logo Canvas Container -->
+    <div class="logo-section" id="logo-container"></div>
+
+    <!-- About / Architecture Introduction -->
+    <div class="about-section">
+        <h1 data-i18n="aboutTitle">Otium Code LLM — Network Primitives &amp; Architecture</h1>
+        <p data-i18n="aboutP1">
+            Otium Code LLM is a bilingual (Danish and English) autoregressive Transformer engineered for 32K long-context reasoning, lossless continuous FIFO token streaming, C++20 grammar-constrained decoding, live AST calculator execution, and rejection-sampled reinforcement learning.
+        </p>
+        <p data-i18n="aboutP2">
+            The interactive schematic below illustrates every primitive in the network from <strong>Input Gather</strong> to <strong>Output Logits</strong>. Click any block in the diagram or any card on the right to isolate and inspect that primitive.
+        </p>
+    </div>
+
+    <!-- Sevren-Style Static Click-to-Highlight Primitives Diagram -->
+    <div class="projects-section">
+        <div class="section-title-row">
+            <h2 data-i18n="diagramHeading">Network Architecture: Input Gather to Output Logits</h2>
+            <button class="btn-nav" type="button" onclick="selectPrimitive(0)" data-i18n="resetViewBtn">Show All Primitives</button>
+        </div>
+
+        <div class="arch-layout">
+            <!-- LEFT: Static High-Contrast SVG Schematic (viewBox 0 0 600 900) -->
+            <div class="svg-board-wrapper">
+                <div class="svg-legend">
+                    <span class="legend-chip"><span class="legend-dot" style="background:#64B5F6;"></span><span data-i18n="legGather">Input Gather</span></span>
+                    <span class="legend-chip"><span class="legend-dot" style="background:#4CAF50;"></span><span data-i18n="legSwa">15 Sliding (S)</span></span>
+                    <span class="legend-chip"><span class="legend-dot" style="background:#FFB74D;"></span><span data-i18n="legFull">5 Full (L)</span></span>
+                    <span class="legend-chip"><span class="legend-dot" style="background:#CE93D8;"></span><span data-i18n="legRes">x₀ / VE / Backout</span></span>
+                    <span class="legend-chip"><span class="legend-dot" style="background:#EF9A9A;"></span><span data-i18n="legPda">C++20 PDA Mask</span></span>
+                </div>
+
+                <svg id="arch-svg" class="arch-svg" viewBox="0 0 600 900" role="img" aria-label="Otium Code LLM Network Primitives">
+                    <defs>
+                        <marker id="arr-blue" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                            <path d="M 0 1 L 9 5 L 0 9 z" fill="#64B5F6"/>
+                        </marker>
+                        <marker id="arr-green" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                            <path d="M 0 1 L 9 5 L 0 9 z" fill="#4CAF50"/>
+                        </marker>
+                        <marker id="arr-amber" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                            <path d="M 0 1 L 9 5 L 0 9 z" fill="#FFB74D"/>
+                        </marker>
+                        <marker id="arr-purple" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                            <path d="M 0 1 L 9 5 L 0 9 z" fill="#CE93D8"/>
+                        </marker>
+                        <marker id="arr-red" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                            <path d="M 0 1 L 9 5 L 0 9 z" fill="#EF9A9A"/>
+                        </marker>
+                    </defs>
+
+                    <!-- ========================================================
+                         PRIMITIVE 1: INPUT GATHER (Continuous FIFO Stream + wte Lookup + Smear)
+                         ======================================================== -->
+                    <g id="svg-prim-1" class="svg-prim highlighted" onclick="selectPrimitive(1)">
+                        <rect x="12" y="10" width="576" height="114" rx="6" fill="#171e24" stroke="#64B5F6" stroke-width="1.5"/>
+                        <text x="24" y="28" fill="#64B5F6" font-family="monospace" font-size="10.5" font-weight="bold">01. INPUT GATHER — CONTINUOUS FIFO STREAM &amp; UNTIED wte TABLE</text>
+
+                        <!-- Continuous FIFO Token Stream Box -->
+                        <rect x="24" y="37" width="174" height="75" rx="4" fill="#141414" stroke="#333"/>
+                        <text x="32" y="51" fill="#fff" font-family="monospace" font-size="8.8" font-weight="bold">Continuous FIFO Stream</text>
+                        <text x="32" y="63" fill="#999" font-family="monospace" font-size="7.6">overlap K=0/64 · intra-doc mask</text>
+
+                        <!-- Token cells: <|bos|>, t-2, t-1, t -->
+                        <rect x="31" y="71" width="38" height="30" rx="3" fill="#1c1c1c" stroke="#444"/>
+                        <text x="50" y="84" text-anchor="middle" fill="#888" font-family="monospace" font-size="7.2">&lt;|bos|&gt;</text>
+                        <text x="50" y="95" text-anchor="middle" fill="#666" font-family="monospace" font-size="6.8">t-2</text>
+
+                        <rect x="73" y="71" width="54" height="30" rx="3" fill="#211a26" stroke="#CE93D8" stroke-width="1.1"/>
+                        <text x="100" y="84" text-anchor="middle" fill="#CE93D8" font-family="monospace" font-size="7.8" font-weight="bold">id=4812</text>
+                        <text x="100" y="95" text-anchor="middle" fill="#bbb" font-family="monospace" font-size="7">t-1 (prev)</text>
+
+                        <rect x="131" y="71" width="58" height="30" rx="3" fill="#162618" stroke="#4CAF50" stroke-width="1.4"/>
+                        <text x="160" y="84" text-anchor="middle" fill="#4CAF50" font-family="monospace" font-size="8" font-weight="bold">id=334</text>
+                        <text x="160" y="95" text-anchor="middle" fill="#fff" font-family="monospace" font-size="7">t (current)</text>
+
+                        <!-- Gather Arrow -->
+                        <line x1="198" y1="76" x2="222" y2="76" stroke="#64B5F6" stroke-width="1.6" marker-end="url(#arr-blue)"/>
+                        <text x="210" y="69" text-anchor="middle" fill="#64B5F6" font-family="monospace" font-size="7.5">gather</text>
+
+                        <!-- Untied Token Embedding Table (wte: 32,768 x 1,280) -->
+                        <rect x="226" y="37" width="210" height="75" rx="4" fill="#141414" stroke="#4CAF50" stroke-width="1.3"/>
+                        <text x="235" y="51" fill="#fff" font-family="monospace" font-size="8.8" font-weight="bold">Untied wte (32,768 × 1,280)</text>
+                        <rect x="235" y="56" width="192" height="11" rx="2" fill="#1b1b1b" stroke="#333"/>
+                        <rect x="235" y="70" width="192" height="13" rx="2" fill="#172819" stroke="#4CAF50" stroke-width="1.1"/>
+                        <text x="240" y="79" fill="#4CAF50" font-family="monospace" font-size="7.6" font-weight="bold">row e_{t-1} = wte[4812]</text>
+                        <rect x="235" y="86" width="192" height="14" rx="2" fill="#172819" stroke="#4CAF50" stroke-width="1.4"/>
+                        <text x="240" y="96" fill="#4CAF50" font-family="monospace" font-size="7.8" font-weight="bold">row e_t     = wte[334]</text>
+
+                        <!-- Smear Gate + Initial RMSNorm producing x_0 -->
+                        <line x1="436" y1="76" x2="456" y2="76" stroke="#4CAF50" stroke-width="1.6" marker-end="url(#arr-green)"/>
+                        <rect x="460" y="37" width="116" height="75" rx="4" fill="#141414" stroke="#CE93D8" stroke-width="1.2"/>
+                        <text x="468" y="51" fill="#CE93D8" font-family="monospace" font-size="8.5" font-weight="bold">smear_gate</text>
+                        <text x="468" y="64" fill="#ccc" font-family="monospace" font-size="7.5">e_t + λ_s·g·e_{t-1}</text>
+                        <text x="468" y="75" fill="#888" font-family="monospace" font-size="7">(masked at &lt;|bos|&gt;)</text>
+                        <rect x="468" y="82" width="100" height="22" rx="3" fill="#172819" stroke="#4CAF50" stroke-width="1.2"/>
+                        <text x="518" y="96" text-anchor="middle" fill="#4CAF50" font-family="monospace" font-size="8.4" font-weight="bold">x₀ = RMSNorm</text>
+                    </g>
+
+                    <!-- Spine Entry Arrow -->
+                    <line x1="300" y1="124" x2="300" y2="144" stroke="#4CAF50" stroke-width="1.8" marker-end="url(#arr-green)"/>
+
+                    <!-- ========================================================
+                         PRIMITIVE 2: 20-LAYER 'SSSL' TRANSFORMER SPINE (CENTER)
+                         ======================================================== -->
+                    <g id="svg-prim-2" class="svg-prim highlighted" onclick="selectPrimitive(2)">
+                        <rect x="196" y="146" width="208" height="442" rx="6" fill="#161616" stroke="#383838" stroke-width="1.3"/>
+                        <text x="300" y="163" text-anchor="middle" fill="#fff" font-family="monospace" font-size="9.5" font-weight="bold">02. 20-LAYER 'SSSL' SPINE</text>
+                        <!-- 20 Layers (L00..L19) statically populated by JS -->
+                        <g id="svg-spine-layers"></g>
+                    </g>
+
+                    <!-- ========================================================
+                         PRIMITIVE 3: RESIDUAL HIGHWAYS & VALUE EMBEDDINGS (LEFT)
+                         ======================================================== -->
+                    <g id="svg-prim-3" class="svg-prim highlighted" onclick="selectPrimitive(3)">
+                        <!-- x0_lambdas Vertical Bus -->
+                        <path d="M 176 124 L 176 566" fill="none" stroke="#CE93D8" stroke-width="2"/>
+                        <line x1="176" y1="196" x2="196" y2="196" stroke="#CE93D8" stroke-width="1.3" marker-end="url(#arr-purple)"/>
+                        <line x1="176" y1="276" x2="196" y2="276" stroke="#CE93D8" stroke-width="1.3" marker-end="url(#arr-purple)"/>
+                        <line x1="176" y1="356" x2="196" y2="356" stroke="#CE93D8" stroke-width="1.3" marker-end="url(#arr-purple)"/>
+                        <line x1="176" y1="436" x2="196" y2="436" stroke="#CE93D8" stroke-width="1.3" marker-end="url(#arr-purple)"/>
+                        <line x1="176" y1="516" x2="196" y2="516" stroke="#CE93D8" stroke-width="1.3" marker-end="url(#arr-purple)"/>
+
+                        <!-- x0 Highway Box -->
+                        <rect x="12" y="152" width="152" height="114" rx="5" fill="#1d1622" stroke="#CE93D8" stroke-width="1.2"/>
+                        <text x="20" y="170" fill="#CE93D8" font-family="monospace" font-size="9.2" font-weight="bold">03. x₀ HIGHWAY</text>
+                        <text x="20" y="186" fill="#fff" font-family="monospace" font-size="8">resid_λ·x + x0_λ·x₀</text>
+                        <text x="20" y="202" fill="#aaa" font-family="monospace" font-size="7.6">Every layer mixes</text>
+                        <text x="20" y="214" fill="#aaa" font-family="monospace" font-size="7.6">gathered x₀ directly</text>
+                        <text x="20" y="226" fill="#aaa" font-family="monospace" font-size="7.6">into residual stream.</text>
+
+                        <!-- Alternating Value Embeddings (VE) Box -->
+                        <rect x="12" y="280" width="152" height="118" rx="5" fill="#1d1622" stroke="#CE93D8" stroke-width="1.2"/>
+                        <text x="20" y="298" fill="#CE93D8" font-family="monospace" font-size="9.2" font-weight="bold">VALUE EMBEDS (VE)</text>
+                        <text x="20" y="314" fill="#fff" font-family="monospace" font-size="8">ve_gate = 2·σ(W_g·x)</text>
+                        <text x="20" y="328" fill="#66BB6A" font-family="monospace" font-size="7.8">v ← v + ve_gate·VE[t]</text>
+                        <text x="20" y="344" fill="#aaa" font-family="monospace" font-size="7.6">Odd layers gather</text>
+                        <text x="20" y="356" fill="#aaa" font-family="monospace" font-size="7.6">token rows directly</text>
+                        <text x="20" y="368" fill="#aaa" font-family="monospace" font-size="7.6">into attention V.</text>
+
+                        <!-- Mid-Network Backout at Layer 10 -->
+                        <path d="M 196 372 L 168 372 L 168 600 L 292 600" fill="none" stroke="#EF9A9A" stroke-width="1.6" marker-end="url(#arr-red)"/>
+                        <rect x="12" y="412" width="148" height="106" rx="5" fill="#241616" stroke="#EF9A9A" stroke-width="1.2"/>
+                        <text x="20" y="430" fill="#EF9A9A" font-family="monospace" font-size="9.2" font-weight="bold">LAYER 10 BACKOUT</text>
+                        <text x="20" y="446" fill="#fff" font-family="monospace" font-size="8">x ← x − λ_back·x_mid</text>
+                        <text x="20" y="462" fill="#aaa" font-family="monospace" font-size="7.6">Caches residual at</text>
+                        <text x="20" y="474" fill="#aaa" font-family="monospace" font-size="7.6">L10 and subtracts it</text>
+                        <text x="20" y="486" fill="#aaa" font-family="monospace" font-size="7.6">before final RMSNorm.</text>
+                    </g>
+
+                    <!-- ========================================================
+                         PRIMITIVE 4: CIRCULAR RING KV CACHE (RIGHT TOP)
+                         ======================================================== -->
+                    <g id="svg-prim-4" class="svg-prim highlighted" onclick="selectPrimitive(4)">
+                        <line x1="404" y1="210" x2="424" y2="210" stroke="#4CAF50" stroke-width="1.5" marker-end="url(#arr-green)"/>
+                        <line x1="404" y1="312" x2="424" y2="312" stroke="#FFB74D" stroke-width="1.5" marker-end="url(#arr-amber)"/>
+
+                        <rect x="428" y="152" width="160" height="206" rx="5" fill="#152016" stroke="#4CAF50" stroke-width="1.3"/>
+                        <text x="438" y="170" fill="#4CAF50" font-family="monospace" font-size="9.2" font-weight="bold">04. RING KV CACHE</text>
+                        <text x="438" y="185" fill="#fff" font-family="monospace" font-size="8">15 Sliding ('S') Layers</text>
+                        <text x="438" y="198" fill="#aaa" font-family="monospace" font-size="7.5">Bounded cap = W + 1</text>
+
+                        <!-- Static Circular Ring Buffer Graphic -->
+                        <circle cx="508" cy="238" r="26" fill="none" stroke="#263828" stroke-width="6"/>
+                        <circle cx="508" cy="238" r="26" fill="none" stroke="#4CAF50" stroke-width="6" stroke-dasharray="122 42" stroke-linecap="round"/>
+                        <line x1="508" y1="238" x2="526" y2="220" stroke="#FFB74D" stroke-width="2"/>
+                        <circle cx="526" cy="220" r="3" fill="#FFB74D"/>
+                        <text x="508" y="278" text-anchor="middle" fill="#66BB6A" font-family="monospace" font-size="7.8">slot = pos % (W + 1)</text>
+
+                        <line x1="438" y1="288" x2="578" y2="288" stroke="#283829"/>
+                        <text x="438" y="303" fill="#FFB74D" font-family="monospace" font-size="8.2" font-weight="bold">5 Full ('L') Layers</text>
+                        <text x="438" y="316" fill="#aaa" font-family="monospace" font-size="7.5">L03, L07, L11, L15, L19</text>
+                        <text x="438" y="328" fill="#aaa" font-family="monospace" font-size="7.5">QK-RMSNorm (1.2× scale)</text>
+                        <text x="438" y="340" fill="#aaa" font-family="monospace" font-size="7.5">RoPE θ = 100k → 500k</text>
+                    </g>
+
+                    <!-- ========================================================
+                         PRIMITIVE 5: ReLU² MLP & RFT / GRPO RL (RIGHT BOTTOM)
+                         ======================================================== -->
+                    <g id="svg-prim-5" class="svg-prim highlighted" onclick="selectPrimitive(5)">
+                        <line x1="404" y1="450" x2="424" y2="450" stroke="#4CAF50" stroke-width="1.5" marker-end="url(#arr-green)"/>
+
+                        <rect x="428" y="370" width="160" height="218" rx="5" fill="#181818" stroke="#4CAF50" stroke-width="1.2"/>
+                        <text x="438" y="388" fill="#4CAF50" font-family="monospace" font-size="9.2" font-weight="bold">05. ReLU² &amp; RFT / RL</text>
+                        <text x="438" y="403" fill="#fff" font-family="monospace" font-size="8">ReLU(x · W_fc)² · W_proj</text>
+                        <text x="438" y="416" fill="#aaa" font-family="monospace" font-size="7.5">Sparse squared activation</text>
+
+                        <!-- Sparse ReLU² Neuron Slots -->
+                        <g transform="translate(438, 424)">
+                            <rect x="0"   y="0" width="24" height="18" rx="2" fill="#121212" stroke="#333"/>
+                            <text x="12"  y="12" text-anchor="middle" fill="#555" font-family="monospace" font-size="7.5">0</text>
+                            <rect x="28"  y="0" width="24" height="18" rx="2" fill="#172819" stroke="#4CAF50"/>
+                            <text x="40"  y="12" text-anchor="middle" fill="#4CAF50" font-family="monospace" font-size="7.5" font-weight="bold">4.1</text>
+                            <rect x="56"  y="0" width="24" height="18" rx="2" fill="#121212" stroke="#333"/>
+                            <text x="68"  y="12" text-anchor="middle" fill="#555" font-family="monospace" font-size="7.5">0</text>
+                            <rect x="84"  y="0" width="24" height="18" rx="2" fill="#172819" stroke="#4CAF50"/>
+                            <text x="96"  y="12" text-anchor="middle" fill="#4CAF50" font-family="monospace" font-size="7.5" font-weight="bold">2.3</text>
+                            <rect x="112" y="0" width="24" height="18" rx="2" fill="#121212" stroke="#333"/>
+                            <text x="124" y="12" text-anchor="middle" fill="#555" font-family="monospace" font-size="7.5">0</text>
+                        </g>
+
+                        <line x1="438" y1="452" x2="578" y2="452" stroke="#2c2c2c"/>
+                        <text x="438" y="467" fill="#fff" font-family="monospace" font-size="8.2" font-weight="bold">Rejection Sampling (K=4)</text>
+                        <text x="438" y="480" fill="#aaa" font-family="monospace" font-size="7.5">• Batch=1 prefill → clone 4</text>
+                        <text x="438" y="492" fill="#aaa" font-family="monospace" font-size="7.5">• Loop/fence filter + Judge</text>
+
+                        <line x1="438" y1="504" x2="578" y2="504" stroke="#2c2c2c"/>
+                        <text x="438" y="519" fill="#fff" font-family="monospace" font-size="8.2" font-weight="bold">On-Policy GRPO &amp; Muon</text>
+                        <text x="438" y="532" fill="#aaa" font-family="monospace" font-size="7.5">• A_i = r_i - mean(r)</text>
+                        <text x="438" y="544" fill="#aaa" font-family="monospace" font-size="7.5">• DAPO loss on mask == 1</text>
+                        <text x="438" y="556" fill="#4CAF50" font-family="monospace" font-size="7.5">• 5-step Polar Express</text>
+                    </g>
+
+                    <!-- Spine Exit Arrow -->
+                    <line x1="300" y1="588" x2="300" y2="614" stroke="#4CAF50" stroke-width="1.8" marker-end="url(#arr-green)"/>
+
+                    <!-- ========================================================
+                         PRIMITIVE 6: OUTPUT LOGITS & TANH SOFTCAP
+                         ======================================================== -->
+                    <g id="svg-prim-6" class="svg-prim highlighted" onclick="selectPrimitive(6)">
+                        <rect x="12" y="616" width="576" height="114" rx="6" fill="#151f16" stroke="#4CAF50" stroke-width="1.5"/>
+                        <text x="24" y="634" fill="#4CAF50" font-family="monospace" font-size="10.5" font-weight="bold">06. OUTPUT LOGITS — FINAL RMSNorm → UNTIED lm_head → TANH SOFTCAP</text>
+
+                        <!-- Final RMSNorm -->
+                        <rect x="24" y="644" width="152" height="72" rx="4" fill="#141414" stroke="#333"/>
+                        <text x="32" y="661" fill="#fff" font-family="monospace" font-size="8.8" font-weight="bold">1. Final RMSNorm</text>
+                        <text x="32" y="676" fill="#ccc" font-family="monospace" font-size="7.8">h = RMSNorm(x − Backout)</text>
+                        <text x="32" y="691" fill="#888" font-family="monospace" font-size="7.4">Shape: (B, T, 1280)</text>
+                        <text x="32" y="704" fill="#888" font-family="monospace" font-size="7.4">Zero-parameter scale</text>
+
+                        <line x1="176" y1="680" x2="198" y2="680" stroke="#4CAF50" stroke-width="1.6" marker-end="url(#arr-green)"/>
+
+                        <!-- Untied lm_head -->
+                        <rect x="202" y="644" width="186" height="72" rx="4" fill="#141414" stroke="#4CAF50" stroke-width="1.2"/>
+                        <text x="212" y="661" fill="#fff" font-family="monospace" font-size="8.8" font-weight="bold">2. Untied lm_head</text>
+                        <text x="212" y="676" fill="#4CAF50" font-family="monospace" font-size="8">z_raw = h · W_lm (1280→32,768)</text>
+                        <text x="212" y="691" fill="#aaa" font-family="monospace" font-size="7.5">Untied from input wte table</text>
+                        <text x="212" y="704" fill="#888" font-family="monospace" font-size="7.4">Chunked CE (2048 token strips)</text>
+
+                        <line x1="388" y1="680" x2="410" y2="680" stroke="#FFB74D" stroke-width="1.6" marker-end="url(#arr-amber)"/>
+
+                        <!-- Logit Softcapping -->
+                        <rect x="414" y="644" width="162" height="72" rx="4" fill="#141414" stroke="#FFB74D" stroke-width="1.2"/>
+                        <text x="424" y="661" fill="#FFB74D" font-family="monospace" font-size="8.8" font-weight="bold">3. Logit Softcapping</text>
+                        <text x="424" y="677" fill="#fff" font-family="monospace" font-size="8.2">z = 15.0·tanh(z_raw / 15.0)</text>
+                        <text x="424" y="692" fill="#aaa" font-family="monospace" font-size="7.5">Bounds logits to (-15, +15)</text>
+                        <text x="424" y="704" fill="#888" font-family="monospace" font-size="7.4">Evaluated in Bits-Per-Byte</text>
+                    </g>
+
+                    <!-- Arrow from Softcapped Logits to C++20 Constrained Decoding -->
+                    <line x1="300" y1="730" x2="300" y2="754" stroke="#EF9A9A" stroke-width="1.8" marker-end="url(#arr-red)"/>
+
+                    <!-- ========================================================
+                         PRIMITIVE 7: C++20 CONSTRAINED DECODING & OUTPUT LOGIT DISTRIBUTION
+                         ======================================================== -->
+                    <g id="svg-prim-7" class="svg-prim highlighted" onclick="selectPrimitive(7)">
+                        <rect x="12" y="756" width="576" height="132" rx="6" fill="#211516" stroke="#EF9A9A" stroke-width="1.5"/>
+                        <text x="24" y="774" fill="#EF9A9A" font-family="monospace" font-size="10.5" font-weight="bold">07. C++20 PDA GRAMMAR MASK &amp; CONSTRAINED OUTPUT LOGIT DISTRIBUTION</text>
+
+                        <!-- C++20 Pushdown Automaton Box -->
+                        <rect x="24" y="784" width="186" height="92" rx="4" fill="#141414" stroke="#EF9A9A" stroke-width="1.2"/>
+                        <text x="32" y="800" fill="#EF9A9A" font-family="monospace" font-size="8.8" font-weight="bold">C++20 Pushdown Automaton</text>
+                        <text x="32" y="814" fill="#ccc" font-family="monospace" font-size="7.6">Modes: TOOL_JSON | JSON</text>
+                        <text x="32" y="826" fill="#ccc" font-family="monospace" font-size="7.6">PYTHON (indent) | CPP | TEXT</text>
+                        <rect x="32" y="834" width="170" height="19" rx="3" fill="#291616" stroke="#EF9A9A"/>
+                        <text x="117" y="847" text-anchor="middle" fill="#EF9A9A" font-family="monospace" font-size="7.8" font-weight="bold">z[illegal] = -∞ (&lt;0.5 ms)</text>
+                        <text x="32" y="867" fill="#66BB6A" font-family="monospace" font-size="7.4">&lt;|tool_end|&gt; → AST Calculator</text>
+
+                        <line x1="210" y1="830" x2="232" y2="830" stroke="#4CAF50" stroke-width="1.6" marker-end="url(#arr-green)"/>
+
+                        <!-- Visual Output Logit Distribution Bar Chart -->
+                        <rect x="236" y="784" width="340" height="92" rx="4" fill="#141414" stroke="#4CAF50" stroke-width="1.3"/>
+                        <text x="246" y="800" fill="#fff" font-family="monospace" font-size="8.6" font-weight="bold">Constrained Next-Token Logits (V = 32,768)</text>
+
+                        <!-- Token Bar 1 (Valid highest) -->
+                        <text x="246" y="817" fill="#4CAF50" font-family="monospace" font-size="8" font-weight="bold">"18"</text>
+                        <rect x="292" y="808" width="185" height="10" rx="2" fill="#4CAF50"/>
+                        <text x="484" y="817" fill="#4CAF50" font-family="monospace" font-size="7.8" font-weight="bold">+11.8 (Valid)</text>
+
+                        <!-- Token Bar 2 (Valid runner-up) -->
+                        <text x="246" y="833" fill="#66BB6A" font-family="monospace" font-size="8">"("</text>
+                        <rect x="292" y="824" width="110" height="10" rx="2" fill="#2E7D32"/>
+                        <text x="408" y="833" fill="#aaa" font-family="monospace" font-size="7.8">+6.4 (Valid)</text>
+
+                        <!-- Token Bar 3 (Rejected by PDA: double operator) -->
+                        <text x="246" y="849" fill="#EF9A9A" font-family="monospace" font-size="8" text-decoration="line-through">"**"</text>
+                        <rect x="292" y="840" width="64" height="10" rx="2" fill="#2a1616" stroke="#EF9A9A" stroke-dasharray="2 2"/>
+                        <line x1="290" y1="840" x2="358" y2="850" stroke="#EF9A9A" stroke-width="1.2"/>
+                        <text x="364" y="849" fill="#EF9A9A" font-family="monospace" font-size="7.6" font-weight="bold">-∞ (PDA Masked: double op)</text>
+
+                        <!-- Token Bar 4 (Rejected by PDA: unclosed paren) -->
+                        <text x="246" y="865" fill="#EF9A9A" font-family="monospace" font-size="8" text-decoration="line-through">'"}\''</text>
+                        <rect x="292" y="856" width="52" height="10" rx="2" fill="#2a1616" stroke="#EF9A9A" stroke-dasharray="2 2"/>
+                        <line x1="290" y1="856" x2="346" y2="866" stroke="#EF9A9A" stroke-width="1.2"/>
+                        <text x="352" y="865" fill="#EF9A9A" font-family="monospace" font-size="7.6" font-weight="bold">-∞ (PDA Masked: paren depth≠0)</text>
+                    </g>
+                </svg>
+            </div>
+
+            <!-- RIGHT: 8 Clickable Primitive Cards (All + 01..07) -->
+            <div class="prim-cards-col">
+                <div class="prim-card active" data-prim="0" onclick="selectPrimitive(0)">
+                    <div class="prim-card-meta">
+                        <span class="step-tag" data-i18n="c0Tag">ALL PRIMITIVES</span>
+                        <span>32K Context · V=32,768</span>
+                    </div>
+                    <h3 data-i18n="c0Title">Complete Network Overview</h3>
+                    <p data-i18n="c0Desc">
+                        Shows the full forward and decoding path from continuous token ingestion and input embedding gather through the 20-layer hybrid stack to grammar-constrained output logits.
+                    </p>
+                </div>
+
+                <div class="prim-card" data-prim="1" onclick="selectPrimitive(1)">
+                    <div class="prim-card-meta">
+                        <span class="step-tag">01 · INPUT GATHER</span>
+                        <span>wte (32,768 × 1,280)</span>
+                    </div>
+                    <h3 data-i18n="c1Title">Continuous FIFO Stream &amp; wte Gather</h3>
+                    <p data-i18n="c1Desc">
+                        Tokens enter from a lossless FIFO stream (<span class="chip chip-gather">overlap K=0/64</span>, intra-doc boundary mask). Token IDs gather vector rows $e_{t-1}, e_t$ from the untied <code style="font-family:monospace">wte</code> matrix, mix bigram context via <code style="font-family:monospace">smear_gate</code>, and normalize to $x_0$.
+                    </p>
+                </div>
+
+                <div class="prim-card" data-prim="2" onclick="selectPrimitive(2)">
+                    <div class="prim-card-meta">
+                        <span class="step-tag">02 · 20-LAYER SSSL SCHEDULE</span>
+                        <span>15 Sliding · 5 Full</span>
+                    </div>
+                    <h3 data-i18n="c2Title">20-Layer Hybrid SSSL Attention Spine</h3>
+                    <p data-i18n="c2Desc">
+                        Five blocks of four layers: 15 <span class="chip chip-swa">Sliding Window (S)</span> layers capture local positional order, while 5 <span class="chip chip-full">Full Global (L)</span> layers (<code style="font-family:monospace">L03, L07, L11, L15, L19</code>) attend across the entire 32K sequence.
+                    </p>
+                </div>
+
+                <div class="prim-card" data-prim="3" onclick="selectPrimitive(3)">
+                    <div class="prim-card-meta">
+                        <span class="step-tag">03 · RESIDUAL HIGHWAYS &amp; VE</span>
+                        <span>x₀ · VE · Backout</span>
+                    </div>
+                    <h3 data-i18n="c3Title">x₀ Highway, Value Embeddings &amp; Backout</h3>
+                    <p data-i18n="c3Desc">
+                        Each layer mixes initial $x_0$ via <span class="chip chip-res">resid_lambdas</span> and <span class="chip chip-res">x0_lambdas</span>. Odd layers inject gated token <span class="chip chip-res">Value Embeddings (VE)</span> into attention $V$, and Layer 10's residual is subtracted via <code style="font-family:monospace">backout_lambda</code>.
+                    </p>
+                </div>
+
+                <div class="prim-card" data-prim="4" onclick="selectPrimitive(4)">
+                    <div class="prim-card-meta">
+                        <span class="step-tag">04 · CIRCULAR RING KV CACHE</span>
+                        <span>slot = pos % (W + 1)</span>
+                    </div>
+                    <h3 data-i18n="c4Title">Bounded Ring-Buffer KV &amp; 32K RoPE</h3>
+                    <p data-i18n="c4Desc">
+                        During decoding, the 15 <span class="chip chip-swa">S</span> layers wrap writes inside a fixed $(W + 1)$ circular ring buffer rather than growing linearly, paired with $1.2\times$ QK-RMSNorm and $\theta = 100\text{k} \rightarrow 500\text{k}$ RoPE.
+                    </p>
+                </div>
+
+                <div class="prim-card" data-prim="5" onclick="selectPrimitive(5)">
+                    <div class="prim-card-meta">
+                        <span class="step-tag">05 · ReLU² MLP &amp; RFT / GRPO</span>
+                        <span>K=4 Judge · MuonAdamW</span>
+                    </div>
+                    <h3 data-i18n="c5Title">ReLU² Sparsity, Rejection Sampling &amp; RL</h3>
+                    <p data-i18n="c5Desc">
+                        MLPs apply squared <span class="chip chip-swa">ReLU(x)²</span> for natural activation sparsity. Post-training runs $K=4$ Rejection Sampling with live calculator execution and on-policy GRPO RL ($A_i = r_i - \mu_r$).
+                    </p>
+                </div>
+
+                <div class="prim-card" data-prim="6" onclick="selectPrimitive(6)">
+                    <div class="prim-card-meta">
+                        <span class="step-tag">06 · OUTPUT LOGITS &amp; SOFTCAP</span>
+                        <span>1,280 → 32,768</span>
+                    </div>
+                    <h3 data-i18n="c6Title">Untied lm_head &amp; Tanh Logit Softcap</h3>
+                    <p data-i18n="c6Desc">
+                        Final normalized hidden states project through the untied <code style="font-family:monospace">lm_head</code> to 32,768 vocabulary logits and are smoothly bounded by $15.0\cdot\tanh(z/15.0)$ with chunked cross-entropy training.
+                    </p>
+                </div>
+
+                <div class="prim-card" data-prim="7" onclick="selectPrimitive(7)">
+                    <div class="prim-card-meta">
+                        <span class="step-tag">07 · C++20 CONSTRAINED DECODING</span>
+                        <span>&lt; 0.5 ms PDA Mask</span>
+                    </div>
+                    <h3 data-i18n="c7Title">C++20 Pushdown Automaton &amp; AST Tool</h3>
+                    <p data-i18n="c7Desc">
+                        A native C++20 byte automaton validates all 32,768 next tokens per step across 5 grammar modes, setting illegal logits to <span class="chip chip-pda">-∞</span> and intercepting <code style="font-family:monospace">&lt;|tool_end|&gt;</code> for sandboxed AST math evaluation.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Selected Primitive Formula Bar -->
+        <div class="formula-bar">
+            <div>
+                <div class="formula-bar-title" id="formula-title">Complete Network Overview (All Primitives)</div>
+                <div class="formula-bar-sub" id="formula-sub">Click any primitive block in the diagram or card list to inspect its exact equation.</div>
+            </div>
+            <div class="formula-box" id="formula-code">
+                idx (B,T) → wte[idx] → 20× SSSL Layers → lm_head → 15·tanh(z/15) → C++20 PDA Mask
+            </div>
+        </div>
+    </div>
+
+    <!-- Model & Inference Information Section (Matches chat.html specification table) -->
+    <div class="info-card-section" id="model-info-section">
+        <h2 data-i18n="infoSectionTitle">Model &amp; Inference Information</h2>
+        <table class="info-table">
+            <tr>
+                <td data-i18n="lblModelName">Model Name</td>
+                <td id="page-m-name">Otium Code LLM (Bilingual DA/EN)</td>
+            </tr>
+            <tr>
+                <td data-i18n="lblBaseArch">Base Architecture</td>
+                <td id="page-m-base" data-i18n="valBaseArch">Based on nanochat by Karpathy</td>
+            </tr>
+            <tr>
+                <td data-i18n="lblParams">Parameter Count</td>
+                <td id="page-m-params">~560M (Depth 20 · Untied wte/lm_head + VE)</td>
+            </tr>
+            <tr>
+                <td data-i18n="lblLayers">Layers / Schedule</td>
+                <td id="page-m-layers">20 Layers (5 × SSSL: 15 Sliding + 5 Full)</td>
+            </tr>
+            <tr>
+                <td data-i18n="lblDim">Embedding Dim / Head Dim</td>
+                <td id="page-m-dim">1280 (10 Heads × 128 Dim · QK-RMSNorm)</td>
+            </tr>
+            <tr>
+                <td data-i18n="lblVocab">Tokenizer &amp; Vocabulary</td>
+                <td id="page-m-vocab">32,768 BPE + 21 Extended Control Tokens</td>
+            </tr>
+            <tr>
+                <td data-i18n="lblContext">Context Window &amp; KV Cache</td>
+                <td id="page-m-context">2,048 → 32,768 Tokens (Circular Ring KV W+1)</td>
+            </tr>
+            <tr>
+                <td data-i18n="lblConstraints">Constrained Decoding &amp; Tools</td>
+                <td id="page-m-constraints">C++20 Pushdown Automaton (&lt;0.5 ms) + AST Calculator</td>
+            </tr>
+            <tr>
+                <td data-i18n="lblPostTrain">Post-Training &amp; Optimizer</td>
+                <td id="page-m-post">SFT + RFT (K=4 Judge) + On-Policy GRPO · MuonAdamW</td>
+            </tr>
+            <tr>
+                <td data-i18n="lblDevice">Inference Endpoint</td>
+                <td id="page-m-gpu">CUDA BFloat16 / FP8 (sg.otiumcode.com:9010)</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Redirect Action Bar -->
+    <div class="redirect-cta-bar">
+        <div>
+            <h3 data-i18n="ctaHeading">Interact with the Model or Return to Otium Code</h3>
+            <p data-i18n="ctaSub">Test live streaming generation in the AI Chat interface or return to the main consultancy page.</p>
+        </div>
+        <div class="redirect-btn-group">
+            <a href="en.html" id="bottom-back-link" class="btn-nav">← <span data-i18n="backMainBtn">Back to Otium Code</span></a>
+            <a href="chat.html" class="btn-nav green"><span data-i18n="openChatCta">Open Otium AI Chat (chat.html) →</span></a>
+        </div>
+    </div>
+
+    <!-- Footer (Exact from da.html / en.html) -->
+    <div class="footer">
+        <p id="footer-text"><strong>Location:</strong><br>
+        Denmark, Copenhagen<br>
+        Sværtegade 3, 2. sal i 1118 København K</p>
+    </div>
+</div>
+
+<!-- Info Modal (Matches chat.html modal and syncs with https://sg.otiumcode.com:9010/api/info) -->
+<div id="info-modal" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 data-i18n="infoSectionTitle">Model &amp; Inference Information</h3>
+            <button id="modal-close-btn" class="modal-close" aria-label="Close">✕</button>
+        </div>
+        <table class="info-table">
+            <tr><td data-i18n="lblModelName">Model Name</td><td id="m-name">Otium Code LLM</td></tr>
+            <tr><td data-i18n="lblBaseArch">Base Architecture</td><td data-i18n="valBaseArch">Based on nanochat by Karpathy</td></tr>
+            <tr><td data-i18n="lblParams">Parameter Count</td><td id="m-params">560.0M</td></tr>
+            <tr><td data-i18n="lblLayers">Layers / Depth</td><td id="m-layers">20 (SSSL Hybrid)</td></tr>
+            <tr><td data-i18n="lblDim">Embedding Dim</td><td id="m-dim">1280</td></tr>
+            <tr><td data-i18n="lblHeads">Attention Heads</td><td id="m-heads">10</td></tr>
+            <tr><td data-i18n="lblTotalCtx">Total Context Limit</td><td id="m-context">2048 – 32768 tokens</td></tr>
+            <tr><td data-i18n="lblInBudget">Input Prompt Budget</td><td id="m-in-budget">1280 – 28672 tokens</td></tr>
+            <tr><td data-i18n="lblOutBudget">Generation Buffer</td><td id="m-out-budget">768 – 4096 tokens</td></tr>
+            <tr><td data-i18n="lblDevice">Inference Device</td><td id="m-gpu">NVIDIA CUDA (BF16)</td></tr>
+        </table>
+    </div>
+</div>
+
+<script>
+    // --- 1. Populate the 20 Static SSSL Layers inside #svg-spine-layers ---
+    (function buildStaticSpineLayers() {
+        const container = document.getElementById('svg-spine-layers');
+        if (!container) return;
+        const startY = 174;
+        const rowH = 20.2;
+
+        for (let i = 0; i < 20; i++) {
+            const isFull = (i % 4 === 3) || (i === 19);
+            const hasVE = (i % 2 === 1);
+            const isBackout = (i === 10);
+            const y = startY + i * rowH;
+
+            if (i > 0 && i % 4 === 0) {
+                const sep = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                sep.setAttribute('x1', '204');
+                sep.setAttribute('y1', String(y - 1.6));
+                sep.setAttribute('x2', '396');
+                sep.setAttribute('y2', String(y - 1.6));
+                sep.setAttribute('stroke', '#333');
+                sep.setAttribute('stroke-dasharray', '2 2');
+                container.appendChild(sep);
+            }
+
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('x', '206');
+            rect.setAttribute('y', String(y));
+            rect.setAttribute('width', '188');
+            rect.setAttribute('height', '16.5');
+            rect.setAttribute('rx', '3');
+            rect.setAttribute('fill', isFull ? '#292014' : '#162417');
+            rect.setAttribute('stroke', isFull ? '#FFB74D' : '#4CAF50');
+            rect.setAttribute('stroke-width', isFull ? '1.3' : '0.9');
+            container.appendChild(rect);
+
+            const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            label.setAttribute('x', '213');
+            label.setAttribute('y', String(y + 11.4));
+            label.setAttribute('fill', isFull ? '#FFB74D' : '#66BB6A');
+            label.setAttribute('font-family', 'monospace');
+            label.setAttribute('font-size', '8.2');
+            label.setAttribute('font-weight', isFull ? 'bold' : 'normal');
+            label.textContent = 'L' + String(i).padStart(2, '0') + (isFull ? ' FULL (L)' : ' SLIDE (S)');
+            container.appendChild(label);
+
+            const tags = ['x₀', 'ReLU²'];
+            if (hasVE) tags.unshift('VE');
+            if (isBackout) tags.unshift('BACKOUT');
+
+            const meta = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            meta.setAttribute('x', '388');
+            meta.setAttribute('y', String(y + 11.4));
+            meta.setAttribute('text-anchor', 'end');
+            meta.setAttribute('fill', '#999');
+            meta.setAttribute('font-family', 'monospace');
+            meta.setAttribute('font-size', '7.3');
+            meta.textContent = tags.join('·');
+            container.appendChild(meta);
+        }
+    })();
+
+    // --- 2. Static Click-to-Highlight Primitive Selection ---
+    let currentLang = 'en';
+    let currentPrim = 0;
+
+    const FORMULAS = {
+        en: [
+            {
+                title: "Complete Network Overview (All Primitives)",
+                sub: "Click any primitive block in the diagram or card list to inspect its exact equation.",
+                code: "idx (B,T) → wte[idx] → 20× SSSL Layers → lm_head → 15·tanh(z/15) → C++20 PDA Mask"
+            },
+            {
+                title: "01. Input Gather — Continuous FIFO Stream, Untied wte Lookup & Smear Gate",
+                sub: "Gathers token vectors e_{t-1} and e_t from untied wte (32,768 × 1,280), blends bigram state, and applies initial RMSNorm.",
+                code: "x₀ = RMSNorm( wte[idx_t] + λ_smear · σ(smear_gate(x)) · wte[idx_{t-1}] )"
+            },
+            {
+                title: "02. 20-Layer 'SSSL' Hybrid Attention Schedule",
+                sub: "15 Sliding-Window ('S') layers and 5 Full Global ('L') layers (L03, L07, L11, L15, L19) with QK-RMSNorm.",
+                code: "Pattern = ['S','S','S','L'] × 5  |  AttnScale = 1.2 / sqrt(128)  |  flash_attn_varlen"
+            },
+            {
+                title: "03. Residual Highways — x₀ Scalars, Alternating Value Embeddings & L10 Backout",
+                sub: "Every layer mixes initial x₀; odd layers add gated token Value Embeddings to V; Layer 10 residual is backed out.",
+                code: "x ← λ_resid·x + λ_x0·x₀   |   v += 2·σ(ve_gate(x))·VE[idx]   |   x_out ← x − λ_back·x_10"
+            },
+            {
+                title: "04. Circular Ring-Buffer KV Cache & Long-Context RoPE",
+                sub: "Sliding-window layers overwrite a bounded (W + 1) circular buffer in-place during decoding.",
+                code: "write_slot = pos % (W + 1)   |   RoPE θ = 100,000 → 500,000 (32K context)"
+            },
+            {
+                title: "05. ReLU² Sparse MLP, Rejection Sampling (K=4) & On-Policy GRPO RL",
+                sub: "Squared ReLU induces ~75%+ neuron sparsity; post-training combines Qwen-judged RFT and DAPO token-normalized GRPO.",
+                code: "MLP(x) = ReLU(x · W_fc)² · W_proj   |   L_GRPO = -(r_i - μ_r) · log π_θ(y_t | mask==1)"
+            },
+            {
+                title: "06. Output Logits — Final RMSNorm, Untied lm_head & Tanh Softcap",
+                sub: "Projects hidden states to 32,768 vocabulary logits and smoothly caps magnitude at 15.0.",
+                code: "z = 15.0 · tanh( (RMSNorm(x − λ_back·x_10) · W_lm_head) / 15.0 )"
+            },
+            {
+                title: "07. C++20 Pushdown Automaton Grammar Mask & Live AST Calculator",
+                sub: "Validates all 32,768 tokens in <0.5 ms per step, setting illegal logits to -∞ and executing calculator expressions.",
+                code: "z_constrained[v] = PDA_Valid(state, token_bytes[v]) ? z[v] : -∞"
+            }
+        ],
+        da: [
+            {
+                title: "Komplet Netværks-Overblik (Alle Primitiver)",
+                sub: "Klik på en blok i diagrammet eller et kort til højre for at se den præcise ligning.",
+                code: "idx (B,T) → wte[idx] → 20× SSSL Lag → lm_head → 15·tanh(z/15) → C++20 PDA Mask"
+            },
+            {
+                title: "01. Input Gather — Kontinuerlig FIFO-Strøm, Untied wte & Smear Gate",
+                sub: "Slår token-vektorer e_{t-1} og e_t op i wte (32.768 × 1.280), blander forrige token og normaliserer til x₀.",
+                code: "x₀ = RMSNorm( wte[idx_t] + λ_smear · σ(smear_gate(x)) · wte[idx_{t-1}] )"
+            },
+            {
+                title: "02. 20-Lags 'SSSL' Hybrid Attention-Struktur",
+                sub: "15 Sliding-Window ('S') lag og 5 Full Global ('L') lag (L03, L07, L11, L15, L19) med QK-RMSNorm.",
+                code: "Pattern = ['S','S','S','L'] × 5  |  AttnScale = 1.2 / sqrt(128)  |  flash_attn_varlen"
+            },
+            {
+                title: "03. Residual-Highways — x₀-Vægte, Value Embeddings & L10 Backout",
+                sub: "Hvert lag blander x₀ direkte; ulige lag tilføjer Value Embeddings i V; Lag 10 trækkes fra før sidste norm.",
+                code: "x ← λ_resid·x + λ_x0·x₀   |   v += 2·σ(ve_gate(x))·VE[idx]   |   x_out ← x − λ_back·x_10"
+            },
+            {
+                title: "04. Cirkulær Ring-Buffer KV-Cache & 32K RoPE",
+                sub: "Sliding-window lag skriver i en fast (W + 1) cirkulær ring-buffer under dekodning.",
+                code: "write_slot = pos % (W + 1)   |   RoPE θ = 100.000 → 500.000 (32K kontekst)"
+            },
+            {
+                title: "05. ReLU² Sparse MLP, Rejection Sampling (K=4) & On-Policy GRPO RL",
+                sub: "Kvadreret ReLU giver >75% aktiverings-sparsity; eftertræning kombinerer K=4 RFT og GRPO RL.",
+                code: "MLP(x) = ReLU(x · W_fc)² · W_proj   |   L_GRPO = -(r_i - μ_r) · log π_θ(y_t | mask==1)"
+            },
+            {
+                title: "06. Output Logits — Final RMSNorm, Untied lm_head & Tanh Softcap",
+                sub: "Projicerer skjulte tilstande til 32.768 logits og begrænser dem blødt ved 15,0.",
+                code: "z = 15.0 · tanh( (RMSNorm(x − λ_back·x_10) · W_lm_head) / 15.0 )"
+            },
+            {
+                title: "07. C++20 Pushdown-Automat Grammatik-Maske & AST-Lommeregner",
+                sub: "Validerer alle 32.768 tokens på <0,5 ms pr. skridt og sætter ugyldige logits til -∞.",
+                code: "z_constrained[v] = PDA_Valid(state, token_bytes[v]) ? z[v] : -∞"
+            }
+        ]
+    };
+
+    function selectPrimitive(idx) {
+        currentPrim = idx;
+        for (let i = 1; i <= 7; i++) {
+            const g = document.getElementById('svg-prim-' + i);
+            if (!g) continue;
+            if (idx === 0 || idx === i) {
+                g.classList.remove('dimmed');
+                g.classList.add('highlighted');
+            } else {
+                g.classList.remove('highlighted');
+                g.classList.add('dimmed');
+            }
+        }
+
+        document.querySelectorAll('.prim-card').forEach(card => {
+            const p = parseInt(card.getAttribute('data-prim'), 10);
+            card.classList.toggle('active', p === idx);
+        });
+
+        const f = FORMULAS[currentLang][idx];
+        document.getElementById('formula-title').textContent = f.title;
+        document.getElementById('formula-sub').textContent = f.sub;
+        document.getElementById('formula-code').textContent = f.code;
+    }
+
+    // --- 3. Bilingual Language Switcher (English / Dansk) ---
+    const I18N = {
+        en: {
+            backToSite: "Back to Site",
+            openAiChat: "💬 Open AI Chat",
+            modelInfoBtn: "Model & Inference Info",
+            aboutTitle: "Otium Code LLM — Network Primitives & Architecture",
+            aboutP1: "Otium Code LLM is a bilingual (Danish and English) autoregressive Transformer engineered for 32K long-context reasoning, lossless continuous FIFO token streaming, C++20 grammar-constrained decoding, live AST calculator execution, and rejection-sampled reinforcement learning.",
+            aboutP2: "The interactive schematic below illustrates every primitive in the network from <strong>Input Gather</strong> to <strong>Output Logits</strong>. Click any block in the diagram or any card on the right to isolate and inspect that primitive.",
+            diagramHeading: "Network Architecture: Input Gather to Output Logits",
+            resetViewBtn: "Show All Primitives",
+            legGather: "Input Gather",
+            legSwa: "15 Sliding (S)",
+            legFull: "5 Full (L)",
+            legRes: "x₀ / VE / Backout",
+            legPda: "C++20 PDA Mask",
+            c0Tag: "ALL PRIMITIVES",
+            c0Title: "Complete Network Overview",
+            c0Desc: "Shows the full forward and decoding path from continuous token ingestion and input embedding gather through the 20-layer hybrid stack to grammar-constrained output logits.",
+            c1Title: "Continuous FIFO Stream & wte Gather",
+            c1Desc: 'Tokens enter from a lossless FIFO stream (<span class="chip chip-gather">overlap K=0/64</span>, intra-doc boundary mask). Token IDs gather vector rows e_{t-1}, e_t from the untied <code>wte</code> matrix, mix bigram context via <code>smear_gate</code>, and normalize to x₀.',
+            c2Title: "20-Layer Hybrid SSSL Attention Spine",
+            c2Desc: 'Five blocks of four layers: 15 <span class="chip chip-swa">Sliding Window (S)</span> layers capture local positional order, while 5 <span class="chip chip-full">Full Global (L)</span> layers (<code>L03, L07, L11, L15, L19</code>) attend across the entire 32K sequence.',
+            c3Title: "x₀ Highway, Value Embeddings & Backout",
+            c3Desc: 'Each layer mixes initial x₀ via <span class="chip chip-res">resid_lambdas</span> and <span class="chip chip-res">x0_lambdas</span>. Odd layers inject gated token <span class="chip chip-res">Value Embeddings (VE)</span> into attention V, and Layer 10\'s residual is subtracted via <code>backout_lambda</code>.',
+            c4Title: "Bounded Ring-Buffer KV & 32K RoPE",
+            c4Desc: 'During decoding, the 15 <span class="chip chip-swa">S</span> layers wrap writes inside a fixed (W + 1) circular ring buffer rather than growing linearly, paired with 1.2× QK-RMSNorm and θ = 100k → 500k RoPE.',
+            c5Title: "ReLU² Sparsity, Rejection Sampling & RL",
+            c5Desc: 'MLPs apply squared <span class="chip chip-swa">ReLU(x)²</span> for natural activation sparsity. Post-training runs K=4 Rejection Sampling with live calculator execution and on-policy GRPO RL (A_i = r_i - μ_r).',
+            c6Title: "Untied lm_head & Tanh Logit Softcap",
+            c6Desc: "Final normalized hidden states project through the untied <code>lm_head</code> to 32,768 vocabulary logits and are smoothly bounded by 15.0·tanh(z/15.0) with chunked cross-entropy training.",
+            c7Title: "C++20 Pushdown Automaton & AST Tool",
+            c7Desc: 'A native C++20 byte automaton validates all 32,768 next tokens per step across 5 grammar modes, setting illegal logits to <span class="chip chip-pda">-∞</span> and intercepting <code>&lt;|tool_end|&gt;</code> for sandboxed AST math evaluation.',
+            infoSectionTitle: "Model & Inference Information",
+            lblModelName: "Model Name",
+            lblBaseArch: "Base Architecture",
+            valBaseArch: "Based on nanochat by Karpathy",
+            lblParams: "Parameter Count",
+            lblLayers: "Layers / Schedule",
+            lblDim: "Embedding Dim / Head Dim",
+            lblVocab: "Tokenizer & Vocabulary",
+            lblContext: "Context Window & KV Cache",
+            lblConstraints: "Constrained Decoding & Tools",
+            lblPostTrain: "Post-Training & Optimizer",
+            lblDevice: "Inference Endpoint",
+            lblHeads: "Attention Heads",
+            lblTotalCtx: "Total Context Limit",
+            lblInBudget: "Input Prompt Budget",
+            lblOutBudget: "Generation Buffer",
+            ctaHeading: "Interact with the Model or Return to Otium Code",
+            ctaSub: "Test live streaming generation in the AI Chat interface or return to the main consultancy page.",
+            backMainBtn: "Back to Otium Code",
+            openChatCta: "Open Otium AI Chat (chat.html) →",
+            footerHtml: "<strong>Location:</strong><br>Denmark, Copenhagen<br>Sværtegade 3, 2. sal i 1118 København K"
+        },
+        da: {
+            backToSite: "Tilbage til forsiden",
+            openAiChat: "💬 Åbn AI Chat",
+            modelInfoBtn: "Model & Inferens Info",
+            aboutTitle: "Otium Code LLM — Netværks-Primitiver & Arkitektur",
+            aboutP1: "Otium Code LLM er en tosproget (dansk og engelsk) autoregressiv Transformer udviklet til 32K lang-kontekst ræsonnering, tabsfri kontinuerlig FIFO-tokenstreaming, C++20 grammatikstyret dekodning, live AST-lommeregner og rejection-samplet reinforcement learning.",
+            aboutP2: "Det interaktive diagram herunder viser samtlige primitiver i netværket fra <strong>Input Gather</strong> til <strong>Output Logits</strong>. Klik på en blok i diagrammet eller et kort til højre for at fremhæve og inspicere den enkelte primitiv.",
+            diagramHeading: "Netværksarkitektur: Fra Input Gather til Output Logits",
+            resetViewBtn: "Vis Alle Primitiver",
+            legGather: "Input Gather",
+            legSwa: "15 Sliding (S)",
+            legFull: "5 Full (L)",
+            legRes: "x₀ / VE / Backout",
+            legPda: "C++20 PDA-Maske",
+            c0Tag: "ALLE PRIMITIVER",
+            c0Title: "Komplet Netværks-Overblik",
+            c0Desc: "Viser hele vejen fra kontinuerlig token-streaming og opslag i input-tabellen gennem de 20 hybride lag til grammatikstyrede output-logits.",
+            c1Title: "Kontinuerlig FIFO-Strøm & wte Gather",
+            c1Desc: 'Tokens læses fra en tabsfri FIFO-strøm (<span class="chip chip-gather">overlap K=0/64</span>, intra-doc maske). Token-ID\'er slår rækkerne e_{t-1}, e_t op i <code>wte</code>-matricen, blander kontekst via <code>smear_gate</code> og normaliserer til x₀.',
+            c2Title: "20-Lags Hybrid SSSL Attention-Rygrad",
+            c2Desc: 'Fem blokke af fire lag: 15 <span class="chip chip-swa">Sliding Window (S)</span>-lag fanger lokal ordstilling, mens 5 <span class="chip chip-full">Full Global (L)</span>-lag (<code>L03, L07, L11, L15, L19</code>) ser hele sekvensen på 32K tokens.',
+            c3Title: "x₀-Highway, Value Embeddings & Backout",
+            c3Desc: 'Hvert lag blander det oprindelige x₀ via <span class="chip chip-res">resid_lambdas</span> og <span class="chip chip-res">x0_lambdas</span>. Ulige lag tilføjer <span class="chip chip-res">Value Embeddings (VE)</span> i attention V, og Lag 10 trækkes fra via <code>backout_lambda</code>.',
+            c4Title: "Cirkulær Ring-Buffer KV & 32K RoPE",
+            c4Desc: 'Under dekodning skriver de 15 <span class="chip chip-swa">S</span>-lag i en fast (W + 1) cirkulær ring-buffer fremfor at vokse lineært, kombineret med 1.2× QK-RMSNorm og θ = 100k → 500k RoPE.',
+            c5Title: "ReLU² Sparsity, Rejection Sampling & RL",
+            c5Desc: 'MLP-lagene anvender kvadreret <span class="chip chip-swa">ReLU(x)²</span> for naturlig sparsity. Eftertræning kører K=4 Rejection Sampling med live lommeregner samt on-policy GRPO RL (A_i = r_i - μ_r).',
+            c6Title: "Untied lm_head & Tanh Logit Softcap",
+            c6Desc: "De sidste normaliserede tilstande projiceres gennem <code>lm_head</code> til 32.768 logits og afgrænses blødt med 15.0·tanh(z/15.0) samt chunked cross-entropy.",
+            c7Title: "C++20 Pushdown-Automat & AST-Værktøj",
+            c7Desc: 'En C++20 byte-automat validerer alle 32.768 mulige næste tokens pr. skridt på <0,5 ms, sætter ugyldige logits til <span class="chip chip-pda">-∞</span> og evaluerer matematik via <code>&lt;|tool_end|&gt;</code>.',
+            infoSectionTitle: "Model & Inferens Information",
+            lblModelName: "Modelnavn",
+            lblBaseArch: "Basisarkitektur",
+            valBaseArch: "Baseret på nanochat af Karpathy",
+            lblParams: "Antal Parametre",
+            lblLayers: "Lag / Struktur",
+            lblDim: "Embedding-Dim / Head-Dim",
+            lblVocab: "Tokenizer & Vokabular",
+            lblContext: "Kontekstvindue & KV-Cache",
+            lblConstraints: "Styret Dekodning & Værktøj",
+            lblPostTrain: "Eftertræning & Optimizer",
+            lblDevice: "Inferens-Endpoint",
+            lblHeads: "Attention Heads",
+            lblTotalCtx: "Maks. Kontekstgrænse",
+            lblInBudget: "Input Prompt-Budget",
+            lblOutBudget: "Genererings-Buffer",
+            ctaHeading: "Afprøv Modellen eller Vend Tilbage til Otium Code",
+            ctaSub: "Test live streaming-generering i vores AI Chat eller gå tilbage til hovedsiden.",
+            backMainBtn: "Tilbage til Otium Code",
+            openChatCta: "Åbn Otium AI Chat (chat.html) →",
+            footerHtml: "<strong>Lokation:</strong><br>Danmark, København<br>Sværtegade 3, 2. sal i 1118 København K"
+        }
+    };
+
+    function setLanguage(lang) {
+        currentLang = (lang === 'da') ? 'da' : 'en';
+        document.documentElement.lang = currentLang;
+        document.getElementById('lang-da').classList.toggle('active', currentLang === 'da');
+        document.getElementById('lang-en').classList.toggle('active', currentLang === 'en');
+
+        const homeHref = currentLang === 'da' ? 'da.html' : 'en.html';
+        document.getElementById('top-back-link').setAttribute('href', homeHref);
+        document.getElementById('bottom-back-link').setAttribute('href', homeHref);
+
+        const dict = I18N[currentLang];
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const k = el.getAttribute('data-i18n');
+            if (dict[k]) el.innerHTML = dict[k];
+        });
+        document.getElementById('footer-text').innerHTML = dict.footerHtml;
+        selectPrimitive(currentPrim);
+    }
+
+    // --- 4. Info Modal & Optional Live Endpoint Sync (Matches chat.html) ---
+    const BASE_API = "https://sg.otiumcode.com:9010";
+    const infoModal = document.getElementById('info-modal');
+    const openInfoBtn = document.getElementById('open-info-modal-btn');
+    const closeInfoBtn = document.getElementById('modal-close-btn');
+
+    openInfoBtn.addEventListener('click', async () => {
+        infoModal.style.display = 'flex';
+        try {
+            const res = await fetch(`${BASE_API}/api/info?session_id=arch_view`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data.model) {
+                    if (data.model.name) document.getElementById('m-name').innerText = data.model.name;
+                    if (data.model.parameters) document.getElementById('m-params').innerText = (data.model.parameters / 1e6).toFixed(1) + "M";
+                    if (data.model.layers) document.getElementById('m-layers').innerText = data.model.layers;
+                    if (data.model.dim) document.getElementById('m-dim').innerText = data.model.dim;
+                    if (data.model.heads) document.getElementById('m-heads').innerText = data.model.heads;
+                    if (data.model.gpu) document.getElementById('m-gpu').innerText = data.model.gpu;
+                }
+                if (data.limits) {
+                    if (data.limits.max_context_tokens) document.getElementById('m-context').innerText = data.limits.max_context_tokens + " tokens";
+                    if (data.limits.input_budget) document.getElementById('m-in-budget').innerText = data.limits.input_budget + " tokens";
+                    if (data.limits.reserved_for_generation) document.getElementById('m-out-budget').innerText = data.limits.reserved_for_generation + " tokens";
+                }
+            }
+        } catch (e) {
+            // Keep static specification defaults when offline
+        }
+    });
+
+    closeInfoBtn.addEventListener('click', () => { infoModal.style.display = 'none'; });
+    window.addEventListener('click', (e) => {
+        if (e.target === infoModal) infoModal.style.display = 'none';
+    });
+
+    // --- 5. Three.js Dynamic Shadow Logo Implementation (Exact from da.html / en.html) ---
+    (function() {
+        const container = document.getElementById('logo-container');
+        if (!container) return;
+
+        const BG_HEX = 0x7d7d7d;
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(BG_HEX);
+
+        const viewHeight = 440;
+        let aspect = container.clientWidth / container.clientHeight;
+
+        const camera = new THREE.OrthographicCamera(
+            (-aspect * viewHeight) / 2,
+            (aspect * viewHeight) / 2,
+            viewHeight / 2,
+            -viewHeight / 2,
+            1,
+            2500
+        );
+        camera.position.set(0, 0, 1000);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container.appendChild(renderer.domElement);
+
+        const light = new THREE.DirectionalLight(0xffffff, 1.25);
+        light.position.set(130, -140, 450);
+        light.castShadow = true;
+        light.shadow.mapSize.width = 2048;
+        light.shadow.mapSize.height = 2048;
+        light.shadow.camera.near = 50;
+        light.shadow.camera.far = 1400;
+
+        const shadowBounds = 400;
+        light.shadow.camera.left = -shadowBounds;
+        light.shadow.camera.right = shadowBounds;
+        light.shadow.camera.top = shadowBounds;
+        light.shadow.camera.bottom = -shadowBounds;
+        light.shadow.bias = -0.00005;
+        light.shadow.normalBias = 0.04;
+        scene.add(light);
+
+        const bgMat = new THREE.MeshBasicMaterial({ color: BG_HEX });
+        const logoGreyMat = new THREE.MeshBasicMaterial({ color: 0x868686, shadowSide: THREE.DoubleSide });
+        const logoGreenMat = new THREE.MeshBasicMaterial({ color: 0x78947c, shadowSide: THREE.DoubleSide });
+        const shadowCatcherMat = new THREE.ShadowMaterial({ opacity: 0.38 });
+
+        const planeGeo = new THREE.PlaneGeometry(3000, 3000);
+        const bgMesh = new THREE.Mesh(planeGeo, bgMat);
+        scene.add(bgMesh);
+
+        const shadowPlane = new THREE.Mesh(planeGeo, shadowCatcherMat);
+        shadowPlane.position.set(0, 0, 0.4);
+        shadowPlane.receiveShadow = true;
+        scene.add(shadowPlane);
+
+        const fontLoader = new THREE.FontLoader();
+        fontLoader.load('https://threejs.org/examples/fonts/helvetiker_bold.typeface.json', (font) => {
+            function createCenteredText(text, size, height, letterSpacing, material) {
+                const textGeo = new THREE.TextGeometry(text, {
+                    font: font,
+                    size: size,
+                    height: height,
+                    curveSegments: 8,
+                    bevelEnabled: false,
+                    letterSpacing: letterSpacing
+                });
+                textGeo.computeBoundingBox();
+                const cx = (textGeo.boundingBox.max.x + textGeo.boundingBox.min.x) / 2;
+                const cy = (textGeo.boundingBox.max.y + textGeo.boundingBox.min.y) / 2;
+                textGeo.translate(-cx, -cy, 0);
+
+                const mesh = new THREE.Mesh(textGeo, material);
+                mesh.castShadow = true;
+                mesh.receiveShadow = false;
+                return mesh;
+            }
+
+            const otiumMesh = createCenteredText('OTIUM', 105, 100, 0, logoGreyMat);
+            otiumMesh.position.set(0, 26, -50);
+            scene.add(otiumMesh);
+
+            const codeMesh = createCenteredText('CODE', 34, 80, 4.5, logoGreenMat);
+            codeMesh.position.set(0, -68, -50);
+            scene.add(codeMesh);
+        });
+
+        const MAX_RADIUS = 280;
+        const targetPos = new THREE.Vector2(130, -140);
+
+        function handlePointer(clientX, clientY) {
+            const rect = container.getBoundingClientRect();
+            const relX = clientX - rect.left;
+            const relY = clientY - rect.top;
+
+            const rawX = ((relX / rect.width) * 2 - 1) * ((aspect * viewHeight) / 2);
+            const rawY = (-(relY / rect.height) * 2 + 1) * (viewHeight / 2);
+
+            const dist = Math.hypot(rawX, rawY);
+            if (dist > 0) {
+                const compressedDist = MAX_RADIUS * (dist / (dist + MAX_RADIUS * 0.7));
+                const scale = compressedDist / dist;
+                targetPos.x = rawX * scale;
+                targetPos.y = rawY * scale;
+            }
+        }
+
+        window.addEventListener('mousemove', (e) => handlePointer(e.clientX, e.clientY));
+        container.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                handlePointer(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, { passive: true });
+
+        function handleOrientation(e) {
+            if (e.gamma === null && e.beta === null) return;
+            const tiltX = e.gamma || 0;
+            const tiltY = (e.beta || 45) - 45;
+
+            const normX = Math.max(-1, Math.min(1, tiltX / 28));
+            const normY = Math.max(-1, Math.min(1, tiltY / 28));
+
+            targetPos.x = normX * MAX_RADIUS * 0.9;
+            targetPos.y = -normY * MAX_RADIUS * 0.9;
+        }
+
+        function initGyroscope() {
+            if (typeof DeviceOrientationEvent !== 'undefined' &&
+                typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then((state) => {
+                        if (state === 'granted') {
+                            window.addEventListener('deviceorientation', handleOrientation);
+                        }
+                    })
+                    .catch(console.error);
+            } else if (typeof window.DeviceOrientationEvent !== 'undefined') {
+                window.addEventListener('deviceorientation', handleOrientation);
+            }
+        }
+
+        if (typeof window.DeviceOrientationEvent !== 'undefined' &&
+            typeof DeviceOrientationEvent.requestPermission !== 'function') {
+            window.addEventListener('deviceorientation', handleOrientation);
+        }
+        window.addEventListener('click', initGyroscope, { once: true });
+        window.addEventListener('touchstart', initGyroscope, { once: true });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            light.position.x += (targetPos.x - light.position.x) * 0.12;
+            light.position.y += (targetPos.y - light.position.y) * 0.12;
+            light.target.position.set(0, 0, 0);
+            light.target.updateMatrixWorld();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            aspect = container.clientWidth / container.clientHeight;
+            camera.left = (-aspect * viewHeight) / 2;
+            camera.right = (aspect * viewHeight) / 2;
+            camera.top = viewHeight / 2;
+            camera.bottom = -viewHeight / 2;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+    })();
+</script>
+
+</body>
+</html>
